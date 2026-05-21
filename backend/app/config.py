@@ -19,15 +19,21 @@ class Settings(BaseSettings):
     # Google OAuth
     google_client_id: str = ""
     google_client_secret: str = ""
-    google_redirect_uri: str = "http://localhost:80/api/auth/google/callback"
+    google_redirect_uri: str = ""
 
     # Cesium
     cesium_ion_token: str = ""
 
     # Frontend
-    frontend_url: str = "http://localhost:80"
+    frontend_url: str = ""
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+
+    def model_post_init(self, __context) -> None:
+        # Apply defaults based on frontend_url if not explicitly set
+        base = self.frontend_url or "http://localhost:80"
+        if not self.google_redirect_uri:
+            self.google_redirect_uri = f"{base}/api/auth/google/callback"
 
 
 @lru_cache

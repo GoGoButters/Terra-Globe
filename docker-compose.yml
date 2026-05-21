@@ -52,9 +52,9 @@ services:
       REFRESH_TOKEN_EXPIRE_DAYS: ${REFRESH_TOKEN_EXPIRE_DAYS:-7}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-your-google-client-id.apps.googleusercontent.com}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-your-google-client-secret}
-      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-http://localhost:80/api/auth/google/callback}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-http://localhost:${NGINX_PORT:-80}/api/auth/google/callback}
       CESIUM_ION_TOKEN: ${CESIUM_ION_TOKEN:-your-cesium-ion-token-here}
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:80}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:${NGINX_PORT:-80}}
     depends_on:
       db:
         condition: service_healthy
@@ -74,7 +74,7 @@ services:
     image: nginx:1.25-alpine
     container_name: terra-globe-nginx
     ports:
-      - "80:80"
+      - "${NGINX_PORT:-80}:80"
     volumes:
       - ./frontend:/usr/share/nginx/html:ro
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro

@@ -54,7 +54,9 @@ Edit `.env` and set the following values:
 | `SECRET_KEY` | JWT signing key | Run: `python3 -c "import secrets; print(secrets.token_urlsafe(32))"` |
 | `GOOGLE_CLIENT_ID` | Google OAuth Client ID | `xxx.apps.googleusercontent.com` |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth Client Secret | `GOCSPX-xxx` |
-| `GOOGLE_REDIRECT_URI` | OAuth callback URL | `http://localhost:80/api/auth/google/callback` |
+| `NGINX_PORT` | Nginx host port | `8080` |
+| `POSTGRES_PORT` | PostgreSQL host port | `15432` |
+| `GOOGLE_REDIRECT_URI` | OAuth callback URL | `http://localhost:${NGINX_PORT}/api/auth/google/callback` |
 | `CESIUM_ION_TOKEN` | Cesium Ion access token | Get free at [ion.cesium.com](https://ion.cesium.com) |
 
 > **Note:** Google OAuth is optional. The app works without it — just password-based auth.
@@ -81,9 +83,9 @@ docker compose exec backend python scripts/seed_data.py
 
 ### 5. Open the Application
 
-- **Frontend**: [http://localhost:80](http://localhost:80)
-- **API Docs (Swagger)**: [http://localhost:80/api/docs](http://localhost:80/api/docs)
-- **API Docs (ReDoc)**: [http://localhost:80/api/redoc](http://localhost:80/api/redoc)
+- **Frontend**: `http://localhost:${NGINX_PORT}` (по умолчанию `http://localhost:8080`)
+- **API Docs (Swagger)**: `http://localhost:${NGINX_PORT}/api/docs`
+- **API Docs (ReDoc)**: `http://localhost:${NGINX_PORT}/api/redoc`
 
 ---
 
@@ -93,10 +95,10 @@ After seeding, you can pull live data from external APIs:
 
 ```bash
 # Trigger data fetch (runs in background)
-curl -X POST http://localhost:80/api/admin/data/fetch
+curl -X POST http://localhost:${NGINX_PORT:-8080}/api/admin/data/fetch
 
 # Check fetch status
-curl http://localhost:80/api/admin/data/status
+curl http://localhost:${NGINX_PORT:-8080}/api/admin/data/status
 ```
 
 Or via Swagger UI at `/api/docs`.
@@ -315,7 +317,7 @@ cd backend
 pip install -r requirements.txt
 
 # 2. Set environment variables
-export DATABASE_URL="postgresql+asyncpg://terraglobe:password@localhost:5432/terraglobe"
+export DATABASE_URL="postgresql+asyncpg://terraglobe:password@localhost:${POSTGRES_PORT:-15432}/terraglobe"
 export SECRET_KEY="your-secret-key"
 export CESIUM_ION_TOKEN="your-token"
 
@@ -385,7 +387,7 @@ docker compose exec db pg_isready -U terraglobe
 ### Google OAuth not working
 
 - Verify `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `.env`
-- Add `http://localhost:80/api/auth/google/callback` to authorized redirect URIs in Google Cloud Console
+- Add `http://localhost:${NGINX_PORT}/api/auth/google/callback` to authorized redirect URIs in Google Cloud Console
 - Check that `GOOGLE_REDIRECT_URI` matches exactly
 
 ### Port 80 already in use
@@ -393,7 +395,7 @@ docker compose exec db pg_isready -U terraglobe
 ```bash
 # Change port in docker-compose.yml
 # Or stop the conflicting service:
-sudo lsof -i :80
+sudo lsof -i :${NGINX_PORT:-8080}
 ```
 
 ---
