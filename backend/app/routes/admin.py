@@ -1,13 +1,17 @@
 """Admin endpoints: trigger data fetch, check status."""
 
 import asyncio
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.session import get_db
+from app.db.session import get_db, async_session_factory
 from app.models import APICache
 from app.services.data_pipeline import run_pipeline, get_last_status
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -15,14 +19,27 @@ router = APIRouter()
 @router.post("/data/fetch")
 async def fetch_external_data(
     background_tasks: BackgroundTasks,
-    db: AsyncSession = Depends(get_db),
 ):
     """Trigger data fetch from World Bank, OWID, IMF.
 
-    Runs asynchronously in the background.
+    Runs asynchronously in the background with its own DB session.
     """
-    # Start pipeline in background
-    background_tasks.add_task(run_pipeline, db)
+
+    async def _run_pipeline():
+        async with async_session_factory() as db:
+            async with db.begin():
+                status = await run_pipeline(db)
+                result = status.to_dict()
+                logger.info(
+                    "Manual pipeline completed: %d values, errors=%d",
+                    result["total_values"],
+                    len(result["errors"]),
+                )
+                if result["errors"]:
+                    for err in result["errors"]:
+                        logger.warning("Pipeline error: %s", err)
+
+    background_tasks.add_task(_run_pipeline)
 
     return {
         "status": "started",

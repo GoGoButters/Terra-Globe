@@ -7,6 +7,7 @@ Repository: https://github.com/owid/owid-datasets
 import asyncio
 import csv
 import io
+import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -17,6 +18,8 @@ from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import IndicatorDefinition, IndicatorValue, APICache
+
+logger = logging.getLogger(__name__)
 
 # OWID dataset URLs — these are stable GitHub raw URLs
 OWID_DATASETS = {
@@ -434,6 +437,6 @@ async def fetch_all_indicators(db: AsyncSession) -> int:
                     db.add(iv)
                 total += 1
         except Exception as e:
-            print(f"  Error fetching OWID {our_code}: {e}")
+            logger.error("Error fetching OWID indicator %s: %s", our_code, e, exc_info=True)
 
     return total

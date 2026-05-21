@@ -5,6 +5,7 @@ API docs: https://datahelpdesk.worldbank.org/knowledgebase/articles/889392-about
 """
 
 import asyncio
+import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -17,6 +18,7 @@ from app.config import get_settings
 from app.models import IndicatorDefinition, IndicatorValue, APICache
 
 settings = get_settings()
+logger = logging.getLogger(__name__)
 
 # World Bank indicator codes mapped to our internal codes
 WB_INDICATORS = {
@@ -180,6 +182,6 @@ async def fetch_all_indicators(
                     db.add(iv)
                 total += 1
         except Exception as e:
-            print(f"  Error fetching {our_code}: {e}")
+            logger.error("Error fetching World Bank indicator %s: %s", our_code, e, exc_info=True)
 
     return total

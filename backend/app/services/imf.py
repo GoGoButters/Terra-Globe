@@ -5,6 +5,7 @@ API docs: https://datahelp.imf.org/knowledgebase/articles/1726777-sdmx-rest-web-
 """
 
 import asyncio
+import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 import xml.etree.ElementTree as ET
@@ -15,6 +16,8 @@ from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import IndicatorDefinition, IndicatorValue, APICache
+
+logger = logging.getLogger(__name__)
 
 IMF_API_BASE = "https://sdmxcentral.imf.org/ws/public/sdmxapi/rest"
 CACHE_TTL_HOURS = 24
@@ -204,6 +207,6 @@ async def fetch_all_indicators(db: AsyncSession) -> int:
                     db.add(iv)
                 total += 1
         except Exception as e:
-            print(f"  Error fetching IMF {our_code}: {e}")
+            logger.error("Error fetching IMF indicator %s: %s", our_code, e, exc_info=True)
 
     return total
