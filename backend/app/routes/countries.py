@@ -1,10 +1,11 @@
 """Country endpoints: list, detail, GeoJSON."""
 
+import json
 from typing import Optional
-from fastapi import APIRouter, Depends, Query
-from sqlalchemy import select, func
+
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import select, func, text
 from sqlalchemy.ext.asyncio import AsyncSession
-from geoalchemy2.functions import ST_AsGeoJSON, ST_Centroid, ST_Simplify
 
 from app.db.session import get_db
 from app.models import Country, IndicatorValue
@@ -26,21 +27,14 @@ async def list_countries(
         try:
             parts = bbox.split(",")
             min_lon, min_lat, max_lon, max_lat = map(float, parts)
-            # Use ST_Intersects with a bounding box polygon
-            bbox_geom = (
-                f"ST_MakeEnvelope({min_lon},{min_lat},{max_lon},{max_lat},4326)"
-            )
             query = query.where(
                 func.ST_Intersects(
                     Country.centroid,
-                    func.func.ST_GeomFromText(
-                        f"POLYGON(({min_lon} {min_lat},{max_lon} {min_lat},{max_lon} {max_lat},{min_lon} {max_lat},{min_lon} {min_lat}))",
-                        4326,
-                    ),
+                    func.ST_MakeEnvelope(min_lon, min_lat, max_lon, max_lat, 4326),
                 )
             )
         except (ValueError, IndexError):
-            pass  # Invalid bbox, return all
+            pass
 
     result = await db.execute(query.order_by(Country.name))
     return [
@@ -60,7 +54,6 @@ async def get_country(iso3: str, db: AsyncSession = Depends(get_db)):
     )
     country = result.scalar_one_or_none()
     if not country:
-        from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Country not found")
 
     # Get latest indicator values
@@ -94,51 +87,57 @@ async def get_countries_geojson(
     simplify: Optional[float] = Query(None, description="Simplify tolerance in degrees"),
     db: AsyncSession = Depends(get_db),
 ):
-    """Get all countries as a GeoJSON FeatureCollection.
+    """Get all countries as a GeoJSON FeatureCollection."""
+    try:
+        if simplify and simplify > 0:
+            raw_sql = text("""
+                SELECT jsonb_build_object(
+                    'type', 'FeatureCollection',
+                    'features', COALESCE(jsonb_agg(
+                        jsonb_build_object(
+                            'type', 'Feature',
+                            'properties', jsonb_build_object(
+                                'iso3', c.iso3,
+                                'name', c.name,
+                                'ISO3166-1-Alpha-3', c.iso3
+                            ),
+                            'geometry', ST_AsGeoJSON(ST_Simplify(c.geometry, :tol))::jsonb
+                        )
+                    ), '[]'::jsonb)
+                )
+                FROM countries c
+                WHERE c.geometry IS NOT NULL
+            """)
+            result = await db.execute(raw_sql, {"tol": simplify})
+        else:
+            raw_sql = text("""
+                SELECT jsonb_build_object(
+                    'type', 'FeatureCollection',
+                    'features', COALESCE(jsonb_agg(
+                        jsonb_build_object(
+                            'type', 'Feature',
+                            'properties', jsonb_build_object(
+                                'iso3', c.iso3,
+                                'name', c.name,
+                                'ISO3166-1-Alpha-3', c.iso3
+                            ),
+                            'geometry', ST_AsGeoJSON(c.geometry)::jsonb
+                        )
+                    ), '[]'::jsonb)
+                )
+                FROM countries c
+                WHERE c.geometry IS NOT NULL
+            """)
+            result = await db.execute(raw_sql)
 
-    Supports optional ST_Simplify for reduced payload size at lower zoom levels.
-    """
-    if simplify and simplify > 0:
-        # Simplified geometry
-        geojson_query = f"""
-            SELECT jsonb_build_object(
-                'type', 'FeatureCollection',
-                'features', COALESCE(jsonb_agg(
-                    jsonb_build_object(
-                        'type', 'Feature',
-                        'properties', jsonb_build_object(
-                            'iso3', c.iso3,
-                            'name', c.name,
-                            'ISO3166-1-Alpha-3', c.iso3
-                        ),
-                        'geometry', ST_AsGeoJSON(ST_Simplify(c.geometry, {simplify}))::jsonb
-                    )
-                ), '[]'::jsonb)
-            )
-            FROM countries c
-            WHERE c.geometry IS NOT NULL
-        """
-    else:
-        # Full resolution
-        geojson_query = """
-            SELECT jsonb_build_object(
-                'type', 'FeatureCollection',
-                'features', COALESCE(jsonb_agg(
-                    jsonb_build_object(
-                        'type', 'Feature',
-                        'properties', jsonb_build_object(
-                            'iso3', c.iso3,
-                            'name', c.name,
-                            'ISO3166-1-Alpha-3', c.iso3
-                        ),
-                        'geometry', ST_AsGeoJSON(c.geometry)::jsonb
-                    )
-                ), '[]'::jsonb)
-            )
-            FROM countries c
-            WHERE c.geometry IS NOT NULL
-        """
+        row = result.scalar_one_or_none()
+        if row is None:
+            return {"type": "FeatureCollection", "features": []}
 
-    result = await db.execute(geojson_query)
-    row = result.scalar_one()
-    return row
+        # Ensure it's a dict (jsonb may come as string)
+        if isinstance(row, str):
+            return json.loads(row)
+        return row
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"GeoJSON generation failed: {str(e)}")

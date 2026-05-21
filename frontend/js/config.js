@@ -8,7 +8,12 @@ let CESIUM_ION_TOKEN = '';
 
 async function loadConfig() {
   try {
-    const config = await fetch(`${API_BASE_URL}/config`).then(r => r.json());
+    const resp = await fetch(`${API_BASE_URL}/config`);
+    if (!resp.ok) {
+      console.warn('⚠️ API config returned', resp.status, '— using defaults');
+      return;
+    }
+    const config = await resp.json();
     if (config.cesium_ion_token) {
       CESIUM_ION_TOKEN = config.cesium_ion_token;
       Cesium.Ion.defaultAccessToken = CESIUM_ION_TOKEN;

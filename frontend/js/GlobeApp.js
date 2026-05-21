@@ -11,14 +11,26 @@ class GlobeApp {
   }
 
   async start() {
+    // Check Cesium loaded
+    if (typeof Cesium === 'undefined') {
+      throw new Error(
+        'CesiumJS не загрузился. Проверьте подключение к интернету. ' +
+        'CDN: unpkg.com/cesium — если заблокирован, используйте VPN или локальную копию.'
+      );
+    }
+
     // Load config (Cesium token) from API
     await loadConfig();
 
     // Initialize auth
     await this.authManager.init();
 
-    // Load data from API
-    await this.dataStore.load();
+    // Load data from API (non-blocking — globe works even if data fails)
+    try {
+      await this.dataStore.load();
+    } catch (e) {
+      console.warn('⚠️ Data load failed, globe will start empty:', e.message);
+    }
 
     this.viewer = new Cesium.Viewer('cesiumContainer', {
       animation: false,
@@ -37,13 +49,21 @@ class GlobeApp {
     this.layerManager = new LayerManager(this.viewer, this.dataStore);
 
     // Load layer and alliance data from API
-    await this.layerManager.loadLayersData();
-    await this.layerManager.loadAlliances();
+    try {
+      await this.layerManager.loadLayersData();
+      await this.layerManager.loadAlliances();
+    } catch (e) {
+      console.warn('⚠️ Layer/alliance data failed to load:', e.message);
+    }
 
     this.layerManager.createAllEntities();
 
     this.capitalsManager = new CapitalsManager(this.viewer, this.dataStore);
-    await this.capitalsManager.load();
+    try {
+      await this.capitalsManager.load();
+    } catch (e) {
+      console.warn('⚠️ Capitals failed to load:', e.message);
+    }
 
     this.tradeManager = new TradeManager(this.viewer, this.dataStore, this.capitalsManager);
     await this.tradeManager.load();
@@ -62,6 +82,12 @@ app.start().catch(err => {
   console.error('❌ Fatal startup error:', err);
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:99999;';
-  overlay.innerHTML = `<div style="color:#fff;text-align:center;padding:40px;max-width:500px;"><h2>⚠️ Ошибка загрузки</h2><p style="opacity:0.7;margin-top:12px;">${err.message || 'Не удалось инициализировать приложение. Проверьте подключение к серверу.'}</p><p style="opacity:0.5;margin-top:20px;font-size:13px;">Откройте консоль браузера (F12) для подробностей.</p></div>`;
+  overlay.innerHTML = `
+    <div style="color:#fff;text-align:center;padding:40px;max-width:500px;font-family:system-ui;">
+      <h2 style="margin-bottom:16px;">⚠️ Ошибка загрузки</h2>
+      <p style="opacity:0.8;margin-bottom:12px;">${err.message}</p>
+      <p style="opacity:0.5;font-size:13px;">Откройте консоль браузера (F12) для подробностей.</p>
+      <button onclick="location.reload()" style="margin-top:20px;padding:10px 24px;background:#667eea;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;">Перезагрузить</button>
+    </div>`;
   document.body.appendChild(overlay);
 });
