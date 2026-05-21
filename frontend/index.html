@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TerraGlobe – Ультимативный глобус</title>
+
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.113/Build/Cesium/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.113/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+
+<!-- Левая панель: информация о стране -->
+  <div id="leftPanel">
+    <h2 id="countryName">—</h2>
+
+    <div class="category">
+      <h3 class="category-title">💰 Экономика</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Уровень дохода</span>
+          <span class="info-value" id="countryIncome">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">ВВП</span>
+          <span class="info-value" id="countryGdp">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">ВВП на душу</span>
+          <span class="info-value" id="countryGdpPerCapita">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Инфляция</span>
+          <span class="info-value" id="countryInflation">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Индекс Джини</span>
+          <span class="info-value" id="countryGini">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Безработица</span>
+          <span class="info-value" id="countryUnemployment">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="category">
+      <h3 class="category-title">👥 Социум</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Население</span>
+          <span class="info-value" id="countryPopulation">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">ИЧР</span>
+          <span class="info-value" id="countryHdi">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Продолж. жизни</span>
+          <span class="info-value" id="countryLifeExpectancy">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Грамотность</span>
+          <span class="info-value" id="countryLiteracy">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Плотность нас.</span>
+          <span class="info-value" id="countryPopulationDensity">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Урбанизация</span>
+          <span class="info-value" id="countryUrbanization">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="category">
+      <h3 class="category-title">🗽 Политика</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Индекс свободы</span>
+          <span class="info-value" id="countryFreedom">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Индекс демократии</span>
+          <span class="info-value" id="countryDemocracyIndex">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Восприятие коррупции</span>
+          <span class="info-value" id="countryCorruption">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Свобода прессы</span>
+          <span class="info-value" id="countryPressFreedom">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Полит. стабильность</span>
+          <span class="info-value" id="countryPoliticalStability">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="category">
+      <h3 class="category-title">⚔️ Военные</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Военная мощь</span>
+          <span class="info-value" id="countryMilitaryPower">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Военный бюджет</span>
+          <span class="info-value" id="countryMilitaryBudget">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Ядерное оружие</span>
+          <span class="info-value" id="countryNuclearWeapons">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-hint">Кликните по стране на глобусе</div>
+  </div>
+
+<!-- Правая панель сравнения -->
+  <div id="rightComparePanel">
+    <h2 id="compareCountryName">—</h2>
+
+    <div class="category">
+      <h3 class="category-title">💰 Экономика</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Уровень дохода</span>
+          <span class="info-value" id="compareIncome">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">ВВП</span>
+          <span class="info-value" id="compareGdp">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">ВВП на душу</span>
+          <span class="info-value" id="compareGdpPerCapita">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Инфляция</span>
+          <span class="info-value" id="compareInflation">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Индекс Джини</span>
+          <span class="info-value" id="compareGini">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Безработица</span>
+          <span class="info-value" id="compareUnemployment">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="category">
+      <h3 class="category-title">👥 Социум</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Население</span>
+          <span class="info-value" id="comparePopulation">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">ИЧР</span>
+          <span class="info-value" id="compareHdi">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Продолж. жизни</span>
+          <span class="info-value" id="compareLifeExpectancy">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Грамотность</span>
+          <span class="info-value" id="compareLiteracy">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Плотность нас.</span>
+          <span class="info-value" id="comparePopulationDensity">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Урбанизация</span>
+          <span class="info-value" id="compareUrbanization">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="category">
+      <h3 class="category-title">🗽 Политика</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Индекс свободы</span>
+          <span class="info-value" id="compareFreedom">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Индекс демократии</span>
+          <span class="info-value" id="compareDemocracyIndex">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Восприятие коррупции</span>
+          <span class="info-value" id="compareCorruption">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Свобода прессы</span>
+          <span class="info-value" id="comparePressFreedom">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Полит. стабильность</span>
+          <span class="info-value" id="comparePoliticalStability">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="category">
+      <h3 class="category-title">⚔️ Военные</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Военная мощь</span>
+          <span class="info-value" id="compareMilitaryPower">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Военный бюджет</span>
+          <span class="info-value" id="compareMilitaryBudget">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Ядерное оружие</span>
+          <span class="info-value" id="compareNuclearWeapons">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-hint">Сравнение активно</div>
+  </div>
+
+  <!-- Левая панель слоёв -->
+  <div id="layersPanel">
+    <h3>📊 Слои данных</h3>
+    <div id="layersContent"></div>
+  </div>
+
+ <!-- Нижняя панель управления -->
+  <div id="bottomPanel">
+    <div class="bottom-tools">
+      <button id="layersToggle" class="bottom-btn">📊 Слои</button>
+      <button id="alliancesToggle" class="bottom-btn">🌐 Альянсы</button>
+      <button id="compareToggle" class="bottom-btn">🔍 Сравнение</button>
+      <button id="tradeToggle" class="bottom-btn">📊 Торговля</button>
+      <button id="diplomacyToggle" class="bottom-btn">🤝 Дипломатия</button>
+    </div>
+    <div class="bottom-checks">
+      <label class="checkbox-label">
+        <input type="checkbox" id="showCapitals" checked>
+        <span>Столицы</span>
+      </label>
+    </div>
+  </div>
+
+    <!-- Левая панель альянсов -->
+  <div id="alliancesPanel">
+    <h3>🌐 Международные объединения</h3>
+    <div id="alliancesList"></div>
+  </div>
+
+    <!-- Карточка альянса (справа) -->
+  <div id="allianceCard">
+    <h2 id="allianceCardName">—</h2>
+    <div class="alliance-card-info">
+      <p><span class="ac-label">Год основания:</span> <span id="acFounded">—</span></p>
+      <p><span class="ac-label">Штаб-квартира:</span> <span id="acHQ">—</span></p>
+      <p><span class="ac-label">Стран-участниц:</span> <span id="acCount">—</span></p>
+    </div>
+    <p class="alliance-card-desc" id="acInfo">—</p>
+    <h4>Ключевые положения:</h4>
+    <ul id="acFeatures"></ul>
+    <h4>Страны-участницы:</h4>
+    <div id="acMembers"></div>
+  </div>
+
+  <!-- Карточка слоя (справа) -->
+  <div id="layerCard">
+    <h2 id="layerCardName">—</h2>
+    <p class="layer-card-desc" id="layerDesc">—</p>
+    <p class="layer-card-meta"><span class="ac-label">Методика:</span> <span id="layerMethod">—</span></p>
+    <p class="layer-card-meta"><span class="ac-label">Источник:</span> <span id="layerSource">—</span></p>
+    <a id="layerSourceUrl" href="#" target="_blank" class="layer-source-link">Перейти к источнику ↗</a>
+    <h4>Легенда</h4>
+    <div id="layerLegend"></div>
+  </div>
+
+  <!-- Левая панель торговли -->
+  <div id="tradePanel">
+    <h2 id="tradeCountryName">—</h2>
+    <div class="trade-summary">
+      <div class="trade-summary-item">
+        <span>Экспорт</span>
+        <span id="tradeTotalExports" style="color:#4caf50">—</span>
+      </div>
+      <div class="trade-summary-item">
+        <span>Импорт</span>
+        <span id="tradeTotalImports" style="color:#f44336">—</span>
+      </div>
+      <div class="trade-summary-item">
+        <span>Баланс</span>
+        <span id="tradeBalance">—</span>
+      </div>
+    </div>
+    <div class="category">
+      <h3 class="category-title">🌍 Лидеры по обороту</h3>
+      <div id="tradeTopPartners"></div>
+    </div>
+    <div class="category">
+      <h3 class="category-title">📤 Экспорт</h3>
+      <div id="tradeTopExports"></div>
+    </div>
+    <div class="category">
+      <h3 class="category-title">📥 Импорт</h3>
+      <div id="tradeTopImports"></div>
+    </div>
+    <div class="panel-hint">Кликните по стране для анализа</div>
+  </div>
+
+    <!-- Панель дипломатии -->
+  <div id="diplomacyPanel">
+    <h2 id="diplomacyTitle">—</h2>
+    <p id="diplomacySummary" style="font-size:13px;line-height:1.6;color:rgba(255,255,255,0.8);margin-bottom:20px;"></p>
+    <h4 style="margin:0 0 12px;font-size:13px;text-transform:uppercase;letter-spacing:0.8px;color:rgba(255,255,255,0.5);">Подписанные документы</h4>
+    <div id="diplomacyDocs"></div>
+  </div>
+
+  <div id="hint">🖱️ Вращай глобус | 🔍 Зум | 👆 Кликай по странам</div>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/DataStore.js"></script>
+<script src="js/LayerManager.js"></script>
+<script src="js/CountryCard.js"></script>
+<script src="js/CapitalsManager.js"></script>
+<script src="js/TradeManager.js"></script>
+<script src="js/DiplomacyManager.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/GlobeApp.js"></script>
+</body>
+</html>

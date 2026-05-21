@@ -1,0 +1,300 @@
+{
+  "income": {
+    "category": "economy",
+    "name": "Уровень дохода",
+    "description": "Классификация стран по уровню валового национального дохода на душу населения. Используется Всемирным банком для определения экономического статуса страны.",
+    "methodology": "Метод Atlas: скользящая средняя за три года, скорректированная на инфляцию и обменный курс.",
+    "source": "Всемирный банк",
+    "sourceUrl": "https://data.worldbank.org/indicator/NY.GNP.PCAP.CD",
+    "type": "categorical",
+    "categories": [
+      {"label": "Высокий", "color": "#006837"},
+      {"label": "Выше среднего", "color": "#78c679"},
+      {"label": "Ниже среднего", "color": "#fdae61"},
+      {"label": "Низкий", "color": "#d7191c"}
+    ]
+  },
+  "gdp_per_capita": {
+    "category": "economy",
+    "name": "ВВП на душу населения",
+    "description": "Валовой внутренний продукт в расчёте на одного жителя страны. Показатель экономической активности и уровня жизни.",
+    "methodology": "Номинальный ВВП, делённый на среднегодовую численность населения. Данные в текущих долларах США.",
+    "source": "Международный валютный фонд",
+    "sourceUrl": "https://www.imf.org/en/Data",
+    "type": "gradient",
+    "min": 500,
+    "max": 80000,
+    "stops": [
+      {"value": 500, "label": "$500", "color": "#d73027"},
+      {"value": 5000, "label": "$5 000", "color": "#fdae61"},
+      {"value": 15000, "label": "$15 000", "color": "#fee08b"},
+      {"value": 35000, "label": "$35 000", "color": "#91cf60"},
+      {"value": 80000, "label": "$80 000", "color": "#1a9850"}
+    ]
+  },
+  "inflation": {
+    "category": "economy",
+    "name": "Инфляция",
+    "description": "Годовой прирост общего уровня потребительских цен. Характеризует стабильность национальной валюты и покупательную способность.",
+    "methodology": "Индекс потребительских цен, усреднённый за год.",
+    "source": "Международный валютный фонд",
+    "sourceUrl": "https://www.imf.org/en/Data",
+    "type": "gradient",
+    "min": 0,
+    "max": 50,
+    "stops": [
+      {"value": 0, "label": "0%", "color": "#1a9850"},
+      {"value": 5, "label": "5%", "color": "#91cf60"},
+      {"value": 10, "label": "10%", "color": "#fee08b"},
+      {"value": 25, "label": "25%", "color": "#fdae61"},
+      {"value": 50, "label": "50%+", "color": "#d73027"}
+    ]
+  },
+  "gini": {
+    "category": "economy",
+    "name": "Индекс Джини",
+    "description": "Показатель неравенства доходов в обществе. 0 — полное равенство, 100 — максимальное неравенство.",
+    "methodology": "Кривая Лоренца: соотношение фактического распределения доходов к равномерному.",
+    "source": "Всемирный банк",
+    "sourceUrl": "https://data.worldbank.org/indicator/SI.POV.GINI",
+    "type": "gradient",
+    "min": 20,
+    "max": 65,
+    "stops": [
+      {"value": 20, "label": "20", "color": "#1a9850"},
+      {"value": 35, "label": "35", "color": "#91cf60"},
+      {"value": 45, "label": "45", "color": "#fee08b"},
+      {"value": 55, "label": "55", "color": "#fdae61"},
+      {"value": 65, "label": "65", "color": "#d73027"}
+    ]
+  },
+  "unemployment": {
+    "category": "economy",
+    "name": "Безработица",
+    "description": "Доля экономически активного населения, не имеющего работы, но активно её ищущего.",
+    "methodology": "Опросы рабочей силы по стандартам Международной организации труда.",
+    "source": "Международная организация труда",
+    "sourceUrl": "https://ilostat.ilo.org/",
+    "type": "gradient",
+    "min": 0,
+    "max": 30,
+    "stops": [
+      {"value": 0, "label": "0%", "color": "#1a9850"},
+      {"value": 5, "label": "5%", "color": "#91cf60"},
+      {"value": 10, "label": "10%", "color": "#fee08b"},
+      {"value": 20, "label": "20%", "color": "#fdae61"},
+      {"value": 30, "label": "30%+", "color": "#d73027"}
+    ]
+  },
+  "hdi": {
+    "category": "society",
+    "name": "Индекс человеческого развития",
+    "description": "Комплексный показатель, включающий ожидаемую продолжительность жизни, грамотность, образование и уровень жизни.",
+    "methodology": "Среднее геометрическое индексов: продолжительности жизни, образования и ВНД на душу.",
+    "source": "Программа развития ООН (ПРООН)",
+    "sourceUrl": "https://hdr.undp.org/",
+    "type": "categorical",
+    "categories": [
+      {"label": "Очень высокий (≥0.9)", "color": "#1a9850"},
+      {"label": "Высокий (0.8-0.9)", "color": "#91cf60"},
+      {"label": "Средний (0.7-0.8)", "color": "#fee08b"},
+      {"label": "Низкий (0.55-0.7)", "color": "#fdae61"},
+      {"label": "Очень низкий (<0.55)", "color": "#d73027"}
+    ]
+  },
+  "life_expectancy": {
+    "category": "society",
+    "name": "Ожидаемая продолжительность жизни",
+    "description": "Среднее количество лет, которое новорождённый проживёт при текущих показателях смертности.",
+    "source": "Всемирная организация здравоохранения",
+    "sourceUrl": "https://www.who.int/data/gho",
+    "type": "gradient",
+    "min": 50,
+    "max": 85,
+    "stops": [
+      {"value": 50, "label": "50 лет", "color": "#d73027"},
+      {"value": 60, "label": "60 лет", "color": "#fdae61"},
+      {"value": 70, "label": "70 лет", "color": "#fee08b"},
+      {"value": 78, "label": "78 лет", "color": "#91cf60"},
+      {"value": 85, "label": "85 лет", "color": "#1a9850"}
+    ]
+  },
+  "literacy": {
+    "category": "society",
+    "name": "Грамотность",
+    "description": "Процент взрослого населения (старше 15 лет), умеющего читать и писать.",
+    "source": "Институт статистики ЮНЕСКО",
+    "sourceUrl": "https://uis.unesco.org/",
+    "type": "gradient",
+    "min": 30,
+    "max": 100,
+    "stops": [
+      {"value": 30, "label": "30%", "color": "#d73027"},
+      {"value": 60, "label": "60%", "color": "#fdae61"},
+      {"value": 80, "label": "80%", "color": "#fee08b"},
+      {"value": 95, "label": "95%", "color": "#91cf60"},
+      {"value": 100, "label": "100%", "color": "#1a9850"}
+    ]
+  },
+  "population_density": {
+    "category": "society",
+    "name": "Плотность населения",
+    "description": "Количество жителей на квадратный километр территории.",
+    "source": "ООН, Департамент по экономическим и социальным вопросам",
+    "sourceUrl": "https://population.un.org/",
+    "type": "gradient",
+    "min": 1,
+    "max": 1000,
+    "stops": [
+      {"value": 1, "label": "1 чел/км²", "color": "#1a9850"},
+      {"value": 50, "label": "50 чел/км²", "color": "#91cf60"},
+      {"value": 150, "label": "150 чел/км²", "color": "#fee08b"},
+      {"value": 400, "label": "400 чел/км²", "color": "#fdae61"},
+      {"value": 1000, "label": "1000 чел/км²", "color": "#d73027"}
+    ]
+  },
+  "urbanization": {
+    "category": "society",
+    "name": "Урбанизация",
+    "description": "Доля городского населения в общей численности населения страны.",
+    "source": "ООН",
+    "sourceUrl": "https://population.un.org/wup/",
+    "type": "gradient",
+    "min": 10,
+    "max": 100,
+    "stops": [
+      {"value": 10, "label": "10%", "color": "#d73027"},
+      {"value": 30, "label": "30%", "color": "#fdae61"},
+      {"value": 50, "label": "50%", "color": "#fee08b"},
+      {"value": 70, "label": "70%", "color": "#91cf60"},
+      {"value": 100, "label": "100%", "color": "#1a9850"}
+    ]
+  },
+  "freedom": {
+    "category": "politics",
+    "name": "Индекс свободы",
+    "description": "Оценка политических прав и гражданских свобод. 100 — максимальная свобода, 0 — отсутствие свободы.",
+    "methodology": "Экспертные оценки и анализ законодательства по методологии Freedom House.",
+    "source": "Freedom House",
+    "sourceUrl": "https://freedomhouse.org/reports/freedom-world/freedom-world-research-methodology",
+    "type": "categorical",
+    "categories": [
+      {"label": "Свободные (70-100)", "color": "#1a9850"},
+      {"label": "Частично свободные (40-69)", "color": "#fee08b"},
+      {"label": "Несвободные (0-39)", "color": "#d73027"}
+    ]
+  },
+  "democracy_index": {
+    "category": "politics",
+    "name": "Индекс демократии",
+    "description": "Комплексная оценка состояния демократии по избирательному процессу, гражданским свободам, функционированию правительства и политическому участию.",
+    "source": "Economist Intelligence Unit",
+    "sourceUrl": "https://www.eiu.com/n/campaigns/democracy-index/",
+    "type": "categorical",
+    "categories": [
+      {"label": "Полная демократия (8-10)", "color": "#1a9850"},
+      {"label": "Недостаточная демократия (6-8)", "color": "#91cf60"},
+      {"label": "Переходный режим (4-6)", "color": "#fdae61"},
+      {"label": "Авторитарный режим (<4)", "color": "#d73027"}
+    ]
+  },
+  "corruption": {
+    "category": "politics",
+    "name": "Индекс восприятия коррупции",
+    "description": "Оценка уровня коррупции в государственном секторе. 0 — максимальная коррупция, 100 — отсутствие.",
+    "source": "Transparency International",
+    "sourceUrl": "https://www.transparency.org/en/cpi",
+    "type": "gradient",
+    "min": 10,
+    "max": 90,
+    "stops": [
+      {"value": 10, "label": "10", "color": "#d73027"},
+      {"value": 30, "label": "30", "color": "#fdae61"},
+      {"value": 50, "label": "50", "color": "#fee08b"},
+      {"value": 70, "label": "70", "color": "#91cf60"},
+      {"value": 90, "label": "90", "color": "#1a9850"}
+    ]
+  },
+  "press_freedom": {
+    "category": "politics",
+    "name": "Свобода прессы",
+    "description": "Индекс свободы средств массовой информации. Учитывает законодательство, случаи давления на журналистов и цензуру.",
+    "source": "Репортёры без границ",
+    "sourceUrl": "https://rsf.org/en/index",
+    "type": "gradient",
+    "min": 10,
+    "max": 90,
+    "stops": [
+      {"value": 10, "label": "Свободно", "color": "#1a9850"},
+      {"value": 30, "label": "Удовлетворительно", "color": "#91cf60"},
+      {"value": 50, "label": "Проблематично", "color": "#fee08b"},
+      {"value": 70, "label": "Сложно", "color": "#fdae61"},
+      {"value": 90, "label": "Очень серьёзно", "color": "#d73027"}
+    ]
+  },
+  "political_stability": {
+    "category": "politics",
+    "name": "Политическая стабильность",
+    "description": "Оценка вероятности политической нестабильности или насилия, включая терроризм.",
+    "source": "Всемирный банк",
+    "sourceUrl": "https://info.worldbank.org/governance/wgi/",
+    "type": "gradient",
+    "min": -3,
+    "max": 2,
+    "stops": [
+      {"value": -3, "label": "Нестабильно", "color": "#d73027"},
+      {"value": -1, "label": "Низкая", "color": "#fdae61"},
+      {"value": 0, "label": "Средняя", "color": "#fee08b"},
+      {"value": 1, "label": "Высокая", "color": "#91cf60"},
+      {"value": 2, "label": "Очень высокая", "color": "#1a9850"}
+    ]
+  },
+  "military_power": {
+    "category": "military",
+    "name": "Индекс военной мощи",
+    "description": "Комплексная оценка военного потенциала: численность армии, бюджет, вооружение, технологии, союзники и география.",
+    "source": "Global Firepower",
+    "sourceUrl": "https://www.globalfirepower.com/",
+    "type": "gradient",
+    "min": 0,
+    "max": 100,
+    "stops": [
+      {"value": 0, "label": "Минимальная", "color": "#1a9850"},
+      {"value": 20, "label": "Низкая", "color": "#91cf60"},
+      {"value": 40, "label": "Средняя", "color": "#fee08b"},
+      {"value": 60, "label": "Высокая", "color": "#fdae61"},
+      {"value": 100, "label": "Очень высокая", "color": "#d73027"}
+    ]
+  },
+  "military_budget": {
+    "category": "military",
+    "name": "Военный бюджет",
+    "description": "Годовые расходы на оборону в процентах от ВВП.",
+    "source": "Стокгольмский институт исследования проблем мира (SIPRI)",
+    "sourceUrl": "https://www.sipri.org/databases/milex",
+    "type": "gradient",
+    "min": 0,
+    "max": 10,
+    "stops": [
+      {"value": 0, "label": "0% ВВП", "color": "#1a9850"},
+      {"value": 2, "label": "2% ВВП", "color": "#91cf60"},
+      {"value": 4, "label": "4% ВВП", "color": "#fee08b"},
+      {"value": 6, "label": "6% ВВП", "color": "#fdae61"},
+      {"value": 10, "label": "10% ВВП", "color": "#d73027"}
+    ]
+  },
+  "nuclear_weapons": {
+    "category": "military",
+    "name": "Ядерное оружие",
+    "description": "Статус страны относительно ядерного оружия.",
+    "source": "Федерация американских учёных",
+    "sourceUrl": "https://fas.org/issues/nuclear-weapons/",
+    "type": "categorical",
+    "categories": [
+      {"label": "Обладает ядерным оружием", "color": "#d73027"},
+      {"label": "Размещает ядерное оружие", "color": "#fdae61"},
+      {"label": "Отказалась от ядерного оружия", "color": "#91cf60"},
+      {"label": "Не обладает", "color": "#1a9850"}
+    ]
+  }
+}

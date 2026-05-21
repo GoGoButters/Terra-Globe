@@ -1,0 +1,623 @@
+{
+  "USA": {
+    "name": "США",
+    "total_exports": 3200,
+    "total_imports": 3500,
+    "balance": -300,
+    "top_exports": [
+      { "category": "Нефтепродукты", "value": 185 },
+      { "category": "Электронные схемы", "value": 142 },
+      { "category": "Автомобили", "value": 128 },
+      { "category": "Самолёты", "value": 110 },
+      { "category": "Медицинское оборудование", "value": 95 }
+    ],
+    "top_imports": [
+      { "category": "Электроника", "value": 340 },
+      { "category": "Автомобили", "value": 280 },
+      { "category": "Нефть сырая", "value": 210 },
+      { "category": "Фармацевтика", "value": 165 },
+      { "category": "Одежда", "value": 120 }
+    ],
+    "partners": [
+      { "iso3": "CAN", "name": "Канада", "export": 420, "import": 380 },
+      { "iso3": "MEX", "name": "Мексика", "export": 350, "import": 410 },
+      { "iso3": "CHN", "name": "Китай", "export": 190, "import": 520 },
+      { "iso3": "DEU", "name": "Германия", "export": 140, "import": 180 },
+      { "iso3": "JPN", "name": "Япония", "export": 110, "import": 160 }
+    ]
+  },
+  "CHN": {
+    "name": "Китай",
+    "total_exports": 3500,
+    "total_imports": 2800,
+    "balance": 700,
+    "top_exports": [
+      { "category": "Электроника", "value": 420 },
+      { "category": "Машинное оборудование", "value": 310 },
+      { "category": "Одежда и текстиль", "value": 210 },
+      { "category": "Металлы", "value": 175 },
+      { "category": "Химическая продукция", "value": 150 }
+    ],
+    "top_imports": [
+      { "category": "Нефть сырая", "value": 380 },
+      { "category": "Электронные компоненты", "value": 320 },
+      { "category": "Железная руда", "value": 190 },
+      { "category": "Соя", "value": 125 },
+      { "category": "Автомобили", "value": 110 }
+    ],
+    "partners": [
+      { "iso3": "USA", "name": "США", "export": 520, "import": 190 },
+      { "iso3": "KOR", "name": "Южная Корея", "export": 180, "import": 210 },
+      { "iso3": "JPN", "name": "Япония", "export": 200, "import": 180 },
+      { "iso3": "DEU", "name": "Германия", "export": 160, "import": 140 },
+      { "iso3": "AUS", "name": "Австралия", "export": 80, "import": 160 }
+    ]
+  },
+  "DEU": {
+    "name": "Германия",
+    "total_exports": 1800,
+    "total_imports": 1500,
+    "balance": 300,
+    "top_exports": [
+      { "category": "Автомобили", "value": 310 },
+      { "category": "Промышленное оборудование", "value": 245 },
+      { "category": "Фармацевтика", "value": 160 },
+      { "category": "Электротехника", "value": 130 },
+      { "category": "Химическая продукция", "value": 115 }
+    ],
+    "top_imports": [
+      { "category": "Электроника", "value": 220 },
+      { "category": "Нефть и газ", "value": 180 },
+      { "category": "Автокомпоненты", "value": 140 },
+      { "category": "Металлы", "value": 105 },
+      { "category": "Одежда", "value": 85 }
+    ],
+    "partners": [
+      { "iso3": "USA", "name": "США", "export": 280, "import": 160 },
+      { "iso3": "CHN", "name": "Китай", "export": 140, "import": 220 },
+      { "iso3": "FRA", "name": "Франция", "export": 180, "import": 120 },
+      { "iso3": "NLD", "name": "Нидерланды", "export": 150, "import": 130 },
+      { "iso3": "GBR", "name": "Великобритания", "export": 120, "import": 90 }
+    ]
+  },
+  "JPN": {
+    "name": "Япония",
+    "total_exports": 920,
+    "total_imports": 850,
+    "balance": 70,
+    "top_exports": [
+      { "category": "Автомобили", "value": 210 },
+      { "category": "Электроника", "value": 155 },
+      { "category": "Промышленное оборудование", "value": 120 },
+      { "category": "Металлы", "value": 85 },
+      { "category": "Химическая продукция", "value": 70 }
+    ],
+    "top_imports": [
+      { "category": "Нефть и газ", "value": 220 },
+      { "category": "Электроника", "value": 175 },
+      { "category": "Продовольствие", "value": 95 },
+      { "category": "Металлы", "value": 80 },
+      { "category": "Одежда", "value": 60 }
+    ],
+    "partners": [
+      { "iso3": "USA", "name": "США", "export": 210, "import": 140 },
+      { "iso3": "CHN", "name": "Китай", "export": 180, "import": 240 },
+      { "iso3": "KOR", "name": "Южная Корея", "export": 100, "import": 90 },
+      { "iso3": "AUS", "name": "Австралия", "export": 50, "import": 100 },
+      { "iso3": "THA", "name": "Таиланд", "export": 60, "import": 50 }
+    ]
+  },
+  "GBR": {
+    "name": "Великобритания",
+    "total_exports": 850,
+    "total_imports": 920,
+    "balance": -70,
+    "top_exports": [
+      { "category": "Финансовые услуги", "value": 140 },
+      { "category": "Автомобили", "value": 95 },
+      { "category": "Фармацевтика", "value": 80 },
+      { "category": "Нефтепродукты", "value": 70 },
+      { "category": "Авиадвигатели", "value": 55 }
+    ],
+    "top_imports": [
+      { "category": "Автомобили", "value": 150 },
+      { "category": "Электроника", "value": 120 },
+      { "category": "Нефть", "value": 95 },
+      { "category": "Продовольствие", "value": 80 },
+      { "category": "Одежда", "value": 55 }
+    ],
+    "partners": [
+      { "iso3": "USA", "name": "США", "export": 150, "import": 130 },
+      { "iso3": "DEU", "name": "Германия", "export": 100, "import": 160 },
+      { "iso3": "CHN", "name": "Китай", "export": 60, "import": 140 },
+      { "iso3": "NLD", "name": "Нидерланды", "export": 90, "import": 80 },
+      { "iso3": "FRA", "name": "Франция", "export": 70, "import": 75 }
+    ]
+  },
+  "FRA": {
+    "name": "Франция",
+    "total_exports": 750,
+    "total_imports": 820,
+    "balance": -70,
+    "top_exports": [
+      { "category": "Авиатехника", "value": 120 },
+      { "category": "Автомобили", "value": 85 },
+      { "category": "Фармацевтика", "value": 75 },
+      { "category": "Вино и алкоголь", "value": 55 },
+      { "category": "Косметика", "value": 45 }
+    ],
+    "top_imports": [
+      { "category": "Автомобили", "value": 130 },
+      { "category": "Электроника", "value": 95 },
+      { "category": "Нефть", "value": 80 },
+      { "category": "Продовольствие", "value": 60 },
+      { "category": "Одежда", "value": 45 }
+    ],
+    "partners": [
+      { "iso3": "DEU", "name": "Германия", "export": 200, "import": 250 },
+      { "iso3": "USA", "name": "США", "export": 120, "import": 100 },
+      { "iso3": "ITA", "name": "Италия", "export": 100, "import": 90 },
+      { "iso3": "ESP", "name": "Испания", "export": 95, "import": 80 },
+      { "iso3": "GBR", "name": "Великобритания", "export": 75, "import": 70 }
+    ]
+  },
+  "IND": {
+    "name": "Индия",
+    "total_exports": 770,
+    "total_imports": 890,
+    "balance": -120,
+    "top_exports": [
+      { "category": "Нефтепродукты", "value": 130 },
+      { "category": "ИТ-услуги", "value": 110 },
+      { "category": "Фармацевтика", "value": 85 },
+      { "category": "Текстиль", "value": 70 },
+      { "category": "Драгоценности", "value": 60 }
+    ],
+    "top_imports": [
+      { "category": "Нефть сырая", "value": 240 },
+      { "category": "Электроника", "value": 110 },
+      { "category": "Золото", "value": 80 },
+      { "category": "Уголь", "value": 60 },
+      { "category": "Машинное оборудование", "value": 55 }
+    ],
+    "partners": [
+      { "iso3": "USA", "name": "США", "export": 140, "import": 90 },
+      { "iso3": "CHN", "name": "Китай", "export": 60, "import": 180 },
+      { "iso3": "ARE", "name": "ОАЭ", "export": 80, "import": 70 },
+      { "iso3": "SAU", "name": "Саудовская Аравия", "export": 50, "import": 100 },
+      { "iso3": "GBR", "name": "Великобритания", "export": 65, "import": 40 }
+    ]
+  },
+  "ITA": {
+    "name": "Италия",
+    "total_exports": 680,
+    "total_imports": 620,
+    "balance": 60,
+    "top_exports": [
+      { "category": "Машинное оборудование", "value": 140 },
+      { "category": "Автомобили", "value": 95 },
+      { "category": "Одежда", "value": 75 },
+      { "category": "Продукты питания", "value": 60 },
+      { "category": "Мебель", "value": 50 }
+    ],
+    "top_imports": [
+      { "category": "Автомобили", "value": 110 },
+      { "category": "Нефть и газ", "value": 95 },
+      { "category": "Электроника", "value": 85 },
+      { "category": "Металлы", "value": 70 },
+      { "category": "Химическая продукция", "value": 60 }
+    ],
+    "partners": [
+      { "iso3": "DEU", "name": "Германия", "export": 160, "import": 180 },
+      { "iso3": "FRA", "name": "Франция", "export": 90, "import": 100 },
+      { "iso3": "USA", "name": "США", "export": 80, "import": 60 },
+      { "iso3": "ESP", "name": "Испания", "export": 70, "import": 55 },
+      { "iso3": "GBR", "name": "Великобритания", "export": 55, "import": 45 }
+    ]
+  },
+  "BRA": {
+    "name": "Бразилия",
+    "total_exports": 340,
+    "total_imports": 290,
+    "balance": 50,
+    "top_exports": [
+      { "category": "Соя", "value": 85 },
+      { "category": "Железная руда", "value": 70 },
+      { "category": "Нефть", "value": 55 },
+      { "category": "Мясо", "value": 40 },
+      { "category": "Сахар", "value": 25 }
+    ],
+    "top_imports": [
+      { "category": "Электроника", "value": 65 },
+      { "category": "Машинное оборудование", "value": 55 },
+      { "category": "Химическая продукция", "value": 45 },
+      { "category": "Автомобили", "value": 35 },
+      { "category": "Удобрения", "value": 30 }
+    ],
+    "partners": [
+      { "iso3": "CHN", "name": "Китай", "export": 150, "import": 80 },
+      { "iso3": "USA", "name": "США", "export": 60, "import": 70 },
+      { "iso3": "ARG", "name": "Аргентина", "export": 25, "import": 20 },
+      { "iso3": "DEU", "name": "Германия", "export": 20, "import": 35 },
+      { "iso3": "NLD", "name": "Нидерланды", "export": 15, "import": 10 }
+    ]
+  },
+  "CAN": {
+    "name": "Канада",
+    "total_exports": 580,
+    "total_imports": 550,
+    "balance": 30,
+    "top_exports": [
+      { "category": "Нефть", "value": 160 },
+      { "category": "Автомобили", "value": 85 },
+      { "category": "Золото", "value": 40 },
+      { "category": "Древесина", "value": 35 },
+      { "category": "Алюминий", "value": 30 }
+    ],
+    "top_imports": [
+      { "category": "Автомобили", "value": 90 },
+      { "category": "Электроника", "value": 75 },
+      { "category": "Машинное оборудование", "value": 60 },
+      { "category": "Нефтепродукты", "value": 45 },
+      { "category": "Одежда", "value": 35 }
+    ],
+    "partners": [
+      { "iso3": "USA", "name": "США", "export": 380, "import": 320 },
+      { "iso3": "CHN", "name": "Китай", "export": 40, "import": 85 },
+      { "iso3": "MEX", "name": "Мексика", "export": 25, "import": 40 },
+      { "iso3": "GBR", "name": "Великобритания", "export": 20, "import": 25 },
+      { "iso3": "DEU", "name": "Германия", "export": 15, "import": 30 }
+    ]
+  },
+  "KOR": {
+    "name": "Южная Корея",
+    "total_exports": 780,
+    "total_imports": 700,
+    "balance": 80,
+    "top_exports": [
+      { "category": "Электроника", "value": 280 },
+      { "category": "Автомобили", "value": 140 },
+      { "category": "Судостроение", "value": 95 },
+      { "category": "Машинное оборудование", "value": 80 },
+      { "category": "Нефтепродукты", "value": 60 }
+    ],
+    "top_imports": [
+      { "category": "Нефть сырая", "value": 190 },
+      { "category": "Электроника", "value": 140 },
+      { "category": "Природный газ", "value": 80 },
+      { "category": "Металлы", "value": 65 },
+      { "category": "Химическая продукция", "value": 55 }
+    ],
+    "partners": [
+      { "iso3": "CHN", "name": "Китай", "export": 200, "import": 230 },
+      { "iso3": "USA", "name": "США", "export": 140, "import": 90 },
+      { "iso3": "JPN", "name": "Япония", "export": 90, "import": 100 },
+      { "iso3": "SAU", "name": "Саудовская Аравия", "export": 40, "import": 120 },
+      { "iso3": "VNM", "name": "Вьетнам", "export": 70, "import": 30 }
+    ]
+  },
+  "RUS": {
+    "name": "Россия",
+    "total_exports": 460,
+    "total_imports": 310,
+    "balance": 150,
+    "top_exports": [
+      { "category": "Нефть и газ", "value": 240 },
+      { "category": "Металлы", "value": 55 },
+      { "category": "Уголь", "value": 40 },
+      { "category": "Зерно", "value": 30 },
+      { "category": "Оружие", "value": 25 }
+    ],
+    "top_imports": [
+      { "category": "Машинное оборудование", "value": 80 },
+      { "category": "Электроника", "value": 65 },
+      { "category": "Автомобили", "value": 45 },
+      { "category": "Фармацевтика", "value": 35 },
+      { "category": "Одежда", "value": 25 }
+    ],
+    "partners": [
+      { "iso3": "CHN", "name": "Китай", "export": 140, "import": 100 },
+      { "iso3": "DEU", "name": "Германия", "export": 50, "import": 40 },
+      { "iso3": "TUR", "name": "Турция", "export": 35, "import": 20 },
+      { "iso3": "IND", "name": "Индия", "export": 30, "import": 15 },
+      { "iso3": "ITA", "name": "Италия", "export": 25, "import": 20 }
+    ]
+  },
+  "AUS": {
+    "name": "Австралия",
+    "total_exports": 420,
+    "total_imports": 350,
+    "balance": 70,
+    "top_exports": [
+      { "category": "Железная руда", "value": 140 },
+      { "category": "Уголь", "value": 80 },
+      { "category": "Природный газ", "value": 65 },
+      { "category": "Золото", "value": 35 },
+      { "category": "Пшеница", "value": 25 }
+    ],
+    "top_imports": [
+      { "category": "Автомобили", "value": 65 },
+      { "category": "Электроника", "value": 55 },
+      { "category": "Нефтепродукты", "value": 40 },
+      { "category": "Машинное оборудование", "value": 35 },
+      { "category": "Фармацевтика", "value": 25 }
+    ],
+    "partners": [
+      { "iso3": "CHN", "name": "Китай", "export": 200, "import": 100 },
+      { "iso3": "JPN", "name": "Япония", "export": 80, "import": 40 },
+      { "iso3": "KOR", "name": "Южная Корея", "export": 50, "import": 30 },
+      { "iso3": "USA", "name": "США", "export": 30, "import": 50 },
+      { "iso3": "IND", "name": "Индия", "export": 25, "import": 20 }
+    ]
+  },
+  "ESP": {
+    "name": "Испания",
+    "total_exports": 460,
+    "total_imports": 430,
+    "balance": 30,
+    "top_exports": [
+      { "category": "Автомобили", "value": 95 },
+      { "category": "Продукты питания", "value": 70 },
+      { "category": "Фармацевтика", "value": 55 },
+      { "category": "Одежда", "value": 40 },
+      { "category": "Химическая продукция", "value": 35 }
+    ],
+    "top_imports": [
+      { "category": "Нефть и газ", "value": 85 },
+      { "category": "Автомобили", "value": 70 },
+      { "category": "Электроника", "value": 60 },
+      { "category": "Машинное оборудование", "value": 45 },
+      { "category": "Одежда", "value": 30 }
+    ],
+    "partners": [
+      { "iso3": "FRA", "name": "Франция", "export": 100, "import": 80 },
+      { "iso3": "DEU", "name": "Германия", "export": 80, "import": 110 },
+      { "iso3": "ITA", "name": "Италия", "export": 55, "import": 70 },
+      { "iso3": "GBR", "name": "Великобритания", "export": 45, "import": 35 },
+      { "iso3": "USA", "name": "США", "export": 30, "import": 40 }
+    ]
+  },
+  "MEX": {
+    "name": "Мексика",
+    "total_exports": 590,
+    "total_imports": 620,
+    "balance": -30,
+    "top_exports": [
+      { "category": "Автомобили", "value": 180 },
+      { "category": "Автозапчасти", "value": 110 },
+      { "category": "Электроника", "value": 85 },
+      { "category": "Нефть", "value": 55 },
+      { "category": "Продовольствие", "value": 35 }
+    ],
+    "top_imports": [
+      { "category": "Автозапчасти", "value": 130 },
+      { "category": "Электроника", "value": 110 },
+      { "category": "Машинное оборудование", "value": 85 },
+      { "category": "Нефтепродукты", "value": 60 },
+      { "category": "Пластики", "value": 45 }
+    ],
+    "partners": [
+      { "iso3": "USA", "name": "США", "export": 470, "import": 350 },
+      { "iso3": "CHN", "name": "Китай", "export": 25, "import": 120 },
+      { "iso3": "CAN", "name": "Канада", "export": 40, "import": 55 },
+      { "iso3": "DEU", "name": "Германия", "export": 30, "import": 50 },
+      { "iso3": "JPN", "name": "Япония", "export": 15, "import": 40 }
+    ]
+  },
+  "IDN": {
+    "name": "Индонезия",
+    "total_exports": 280,
+    "total_imports": 240,
+    "balance": 40,
+    "top_exports": [
+      { "category": "Уголь", "value": 65 },
+      { "category": "Пальмовое масло", "value": 55 },
+      { "category": "Нефть и газ", "value": 40 },
+      { "category": "Каучук", "value": 25 },
+      { "category": "Электроника", "value": 20 }
+    ],
+    "top_imports": [
+      { "category": "Нефтепродукты", "value": 55 },
+      { "category": "Машинное оборудование", "value": 45 },
+      { "category": "Электроника", "value": 35 },
+      { "category": "Химическая продукция", "value": 25 },
+      { "category": "Автомобили", "value": 20 }
+    ],
+    "partners": [
+      { "iso3": "CHN", "name": "Китай", "export": 80, "import": 70 },
+      { "iso3": "USA", "name": "США", "export": 40, "import": 30 },
+      { "iso3": "JPN", "name": "Япония", "export": 35, "import": 25 },
+      { "iso3": "SGP", "name": "Сингапур", "export": 25, "import": 30 },
+      { "iso3": "IND", "name": "Индия", "export": 20, "import": 15 }
+    ]
+  },
+  "NLD": {
+    "name": "Нидерланды",
+    "total_exports": 750,
+    "total_imports": 680,
+    "balance": 70,
+    "top_exports": [
+      { "category": "Нефтепродукты", "value": 120 },
+      { "category": "Машинное оборудование", "value": 95 },
+      { "category": "Химическая продукция", "value": 80 },
+      { "category": "Продовольствие", "value": 70 },
+      { "category": "Электроника", "value": 60 }
+    ],
+    "top_imports": [
+      { "category": "Нефть сырая", "value": 110 },
+      { "category": "Электроника", "value": 90 },
+      { "category": "Автомобили", "value": 65 },
+      { "category": "Машинное оборудование", "value": 55 },
+      { "category": "Химическая продукция", "value": 50 }
+    ],
+    "partners": [
+      { "iso3": "DEU", "name": "Германия", "export": 200, "import": 180 },
+      { "iso3": "BEL", "name": "Бельгия", "export": 120, "import": 100 },
+      { "iso3": "GBR", "name": "Великобритания", "export": 80, "import": 60 },
+      { "iso3": "FRA", "name": "Франция", "export": 70, "import": 65 },
+      { "iso3": "USA", "name": "США", "export": 55, "import": 70 }
+    ]
+  },
+  "SAU": {
+    "name": "Саудовская Аравия",
+    "total_exports": 320,
+    "total_imports": 180,
+    "balance": 140,
+    "top_exports": [
+      { "category": "Нефть сырая", "value": 240 },
+      { "category": "Нефтепродукты", "value": 35 },
+      { "category": "Химическая продукция", "value": 20 },
+      { "category": "Пластики", "value": 15 },
+      { "category": "Металлы", "value": 5 }
+    ],
+    "top_imports": [
+      { "category": "Машинное оборудование", "value": 45 },
+      { "category": "Автомобили", "value": 35 },
+      { "category": "Электроника", "value": 30 },
+      { "category": "Продовольствие", "value": 25 },
+      { "category": "Химическая продукция", "value": 15 }
+    ],
+    "partners": [
+      { "iso3": "CHN", "name": "Китай", "export": 100, "import": 50 },
+      { "iso3": "USA", "name": "США", "export": 40, "import": 30 },
+      { "iso3": "JPN", "name": "Япония", "export": 35, "import": 15 },
+      { "iso3": "IND", "name": "Индия", "export": 30, "import": 20 },
+      { "iso3": "KOR", "name": "Южная Корея", "export": 25, "import": 10 }
+    ]
+  },
+  "TUR": {
+    "name": "Турция",
+    "total_exports": 260,
+    "total_imports": 340,
+    "balance": -80,
+    "top_exports": [
+      { "category": "Автомобили", "value": 55 },
+      { "category": "Машинное оборудование", "value": 40 },
+      { "category": "Одежда", "value": 35 },
+      { "category": "Продовольствие", "value": 30 },
+      { "category": "Металлы", "value": 25 }
+    ],
+    "top_imports": [
+      { "category": "Машинное оборудование", "value": 70 },
+      { "category": "Нефть и газ", "value": 65 },
+      { "category": "Электроника", "value": 45 },
+      { "category": "Металлы", "value": 35 },
+      { "category": "Автомобили", "value": 30 }
+    ],
+    "partners": [
+      { "iso3": "DEU", "name": "Германия", "export": 45, "import": 55 },
+      { "iso3": "RUS", "name": "Россия", "export": 15, "import": 60 },
+      { "iso3": "GBR", "name": "Великобритания", "export": 30, "import": 25 },
+      { "iso3": "CHN", "name": "Китай", "export": 15, "import": 40 },
+      { "iso3": "USA", "name": "США", "export": 25, "import": 30 }
+    ]
+  },
+  "CHE": {
+    "name": "Швейцария",
+    "total_exports": 420,
+    "total_imports": 380,
+    "balance": 40,
+    "top_exports": [
+      { "category": "Фармацевтика", "value": 130 },
+      { "category": "Часы", "value": 50 },
+      { "category": "Машинное оборудование", "value": 45 },
+      { "category": "Химическая продукция", "value": 35 },
+      { "category": "Золото", "value": 30 }
+    ],
+    "top_imports": [
+      { "category": "Золото", "value": 80 },
+      { "category": "Фармацевтика", "value": 55 },
+      { "category": "Автомобили", "value": 40 },
+      { "category": "Машинное оборудование", "value": 35 },
+      { "category": "Электроника", "value": 30 }
+    ],
+    "partners": [
+      { "iso3": "DEU", "name": "Германия", "export": 100, "import": 120 },
+      { "iso3": "USA", "name": "США", "export": 70, "import": 50 },
+      { "iso3": "ITA", "name": "Италия", "export": 35, "import": 40 },
+      { "iso3": "FRA", "name": "Франция", "export": 30, "import": 45 },
+      { "iso3": "CHN", "name": "Китай", "export": 25, "import": 35 }
+    ]
+  },
+  "POL": {
+    "name": "Польша",
+    "total_exports": 390,
+    "total_imports": 370,
+    "balance": 20,
+    "top_exports": [
+      { "category": "Машинное оборудование", "value": 85 },
+      { "category": "Автомобили", "value": 65 },
+      { "category": "Электроника", "value": 55 },
+      { "category": "Мебель", "value": 35 },
+      { "category": "Продовольствие", "value": 30 }
+    ],
+    "top_imports": [
+      { "category": "Машинное оборудование", "value": 80 },
+      { "category": "Электроника", "value": 65 },
+      { "category": "Автомобили", "value": 55 },
+      { "category": "Химическая продукция", "value": 40 },
+      { "category": "Нефть", "value": 35 }
+    ],
+    "partners": [
+      { "iso3": "DEU", "name": "Германия", "export": 160, "import": 140 },
+      { "iso3": "CZE", "name": "Чехия", "export": 40, "import": 30 },
+      { "iso3": "GBR", "name": "Великобритания", "export": 30, "import": 25 },
+      { "iso3": "FRA", "name": "Франция", "export": 25, "import": 30 },
+      { "iso3": "ITA", "name": "Италия", "export": 20, "import": 25 }
+    ]
+  },
+  "BEL": {
+    "name": "Бельгия",
+    "total_exports": 480,
+    "total_imports": 460,
+    "balance": 20,
+    "top_exports": [
+      { "category": "Фармацевтика", "value": 100 },
+      { "category": "Автомобили", "value": 70 },
+      { "category": "Химическая продукция", "value": 65 },
+      { "category": "Машинное оборудование", "value": 55 },
+      { "category": "Продовольствие", "value": 40 }
+    ],
+    "top_imports": [
+      { "category": "Фармацевтика", "value": 85 },
+      { "category": "Автомобили", "value": 70 },
+      { "category": "Химическая продукция", "value": 60 },
+      { "category": "Машинное оборудование", "value": 55 },
+      { "category": "Нефтепродукты", "value": 45 }
+    ],
+    "partners": [
+      { "iso3": "NLD", "name": "Нидерланды", "export": 100, "import": 120 },
+      { "iso3": "DEU", "name": "Германия", "export": 120, "import": 100 },
+      { "iso3": "FRA", "name": "Франция", "export": 80, "import": 90 },
+      { "iso3": "GBR", "name": "Великобритания", "export": 40, "import": 35 },
+      { "iso3": "USA", "name": "США", "export": 30, "import": 40 }
+    ]
+  },
+  "SWE": {
+    "name": "Швеция",
+    "total_exports": 210,
+    "total_imports": 200,
+    "balance": 10,
+    "top_exports": [
+      { "category": "Машинное оборудование", "value": 55 },
+      { "category": "Автомобили", "value": 40 },
+      { "category": "Электроника", "value": 30 },
+      { "category": "Бумага", "value": 20 },
+      { "category": "Металлы", "value": 18 }
+    ],
+    "top_imports": [
+      { "category": "Автомобили", "value": 45 },
+      { "category": "Электроника", "value": 40 },
+      { "category": "Машинное оборудование", "value": 35 },
+      { "category": "Нефтепродукты", "value": 25 },
+      { "category": "Продовольствие", "value": 20 }
+    ],
+    "partners": [
+      { "iso3": "DEU", "name": "Германия", "export": 50, "import": 60 },
+      { "iso3": "NOR", "name": "Норвегия", "export": 30, "import": 25 },
+      { "iso3": "USA", "name": "США", "export": 25, "import": 20 },
+      { "iso3": "GBR", "name": "Великобритания", "export": 20, "import": 25 },
+      { "iso3": "DNK", "name": "Дания", "export": 18, "import": 20 }
+    ]
+  }
+}
