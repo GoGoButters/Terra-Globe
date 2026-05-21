@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.session import get_db, async_session_factory
+from app.db.session import get_db
 from app.models import APICache
 from app.services.data_pipeline import run_pipeline, get_last_status
 
@@ -26,18 +26,16 @@ async def fetch_external_data(
     """
 
     async def _run_pipeline():
-        async with async_session_factory() as db:
-            async with db.begin():
-                status = await run_pipeline(db)
-                result = status.to_dict()
-                logger.info(
-                    "Manual pipeline completed: %d values, errors=%d",
-                    result["total_values"],
-                    len(result["errors"]),
-                )
-                if result["errors"]:
-                    for err in result["errors"]:
-                        logger.warning("Pipeline error: %s", err)
+        status = await run_pipeline()
+        result = status.to_dict()
+        logger.info(
+            "Manual pipeline completed: %d values, errors=%d",
+            result["total_values"],
+            len(result["errors"]),
+        )
+        if result["errors"]:
+            for err in result["errors"]:
+                logger.warning("Pipeline error: %s", err)
 
     background_tasks.add_task(_run_pipeline)
 

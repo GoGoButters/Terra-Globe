@@ -1,39 +1,69 @@
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 
+from alembic import command
+from alembic.config import Config
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from app.config import get_settings
 from app.db.session import async_session_factory
-from app.services.data_pipeline import run_pipeline
 from app.routes import auth, countries, indicators, alliances, trade, diplomacy, admin
+from app.services.data_pipeline import run_pipeline
+from scripts.seed_data import run_seed
 
 settings = get_settings()
 logger = logging.getLogger(__name__)
 
 
+def _run_alembic() -> None:
+    """Run alembic migrations synchronously before app starts."""
+    alembic_cfg = Config("/app/alembic.ini")
+    command.upgrade(alembic_cfg, "head")
+    logger.info("Alembic migrations applied")
+
+
+async def _seed_static_data() -> None:
+    """Seed countries, alliances, trade, diplomacy from static files."""
+    logger.info("Seeding static data...")
+    await run_seed()
+    logger.info("Static data seed complete")
+
+
+async def _run_pipeline_background() -> None:
+    """Run data pipeline in background (non-blocking)."""
+    try:
+        status = await run_pipeline()
+        result = status.to_dict()
+        logger.info(
+            "Background pipeline completed: %d values (WB=%d, OWID=%d, IMF=%d), errors=%d",
+            result["total_values"],
+            result["worldbank_values"],
+            result["owid_values"],
+            result["imf_values"],
+            len(result["errors"]),
+        )
+        if result["errors"]:
+            for err in result["errors"]:
+                logger.warning("Pipeline error: %s", err)
+    except Exception:
+        logger.exception("Background data pipeline failed")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Startup: load external data into DB before accepting requests."""
-    logger.info("Starting data pipeline...")
-    try:
-        async with async_session_factory() as db:
-            async with db.begin():
-                status = await run_pipeline(db)
-                result = status.to_dict()
-                logger.info(
-                    "Pipeline completed: %d values (WB=%d, OWID=%d, IMF=%d), errors=%d",
-                    result["total_values"],
-                    result["worldbank_values"],
-                    result["owid_values"],
-                    result["imf_values"],
-                    len(result["errors"]),
-                )
-                if result["errors"]:
-                    for err in result["errors"]:
-                        logger.warning("Pipeline error: %s", err)
-    except Exception:
-        logger.exception("Data pipeline failed on startup")
+    """Startup sequence: migrations → seed → background pipeline."""
+    # 1. Run alembic migrations (blocking — DB must be ready)
+    logger.info("Running alembic migrations...")
+    _run_alembic()
+
+    # 2. Seed static data (countries, alliances, etc.)
+    await _seed_static_data()
+
+    # 3. Kick off external data pipeline in background
+    asyncio.create_task(_run_pipeline_background())
+
     yield
 
 

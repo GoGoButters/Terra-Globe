@@ -263,19 +263,37 @@ async def seed_diplomacy(session: AsyncSession) -> None:
     print(f"  Seeded {len(relations)} diplomatic relations")
 
 
-async def run_seed() -> None:
-    """Run all seed operations."""
-    print("Starting database seed...")
+async def run_seed(session: AsyncSession | None = None) -> None:
+    """Run all seed operations.
 
-    async with async_session_factory() as session:
-        async with session.begin():
-            await seed_countries(session)
-            await seed_indicators(session)
-            await seed_alliances(session)
-            await seed_trade(session)
-            await seed_diplomacy(session)
+    If session is provided, uses it (caller manages transaction).
+    If session is None, creates its own session and transaction.
+    """
+    own_session = session is None
+    if own_session:
+        session = async_session_factory()
+
+    try:
+        if own_session:
+            async with session.begin():
+                await _do_seed(session)
+        else:
+            await _do_seed(session)
+    finally:
+        if own_session:
+            await session.close()
 
     print("Database seed complete!")
+
+
+async def _do_seed(session: AsyncSession) -> None:
+    """Internal seed logic — runs within an existing transaction."""
+    print("Starting database seed...")
+    await seed_countries(session)
+    await seed_indicators(session)
+    await seed_alliances(session)
+    await seed_trade(session)
+    await seed_diplomacy(session)
 
 
 if __name__ == "__main__":

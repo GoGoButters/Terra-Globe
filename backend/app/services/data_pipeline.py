@@ -44,69 +44,59 @@ _last_status: Optional[DataPipelineStatus] = None
 
 
 async def run_pipeline(
-    db: AsyncSession,
+    db: AsyncSession | None = None,
     iso3_list: Optional[list[str]] = None,
 ) -> DataPipelineStatus:
     """Run the full data pipeline.
 
-    Fetches from World Bank, OWID, and IMF concurrently.
+    Each source (World Bank, OWID, IMF) gets its own DB session so that
+    a failure in one does not corrupt the others.
+
+    If *db* is provided it is used for status tracking only; actual
+    fetch operations create their own sessions.
     """
     global _last_status
     _last_status = DataPipelineStatus()
     _last_status.started_at = datetime.now(timezone.utc)
     _last_status.status = "running"
 
-    try:
-        # Run fetchers concurrently
-        tasks = []
+    sources: list[tuple[str, str, bool]] = [
+        ("worldbank", "fetch_all_indicators", True),
+        ("owid", "fetch_all_indicators", False),
+        ("imf", "fetch_all_indicators", False),
+    ]
 
-        # World Bank
-        wb_task = asyncio.create_task(
-            worldbank.fetch_all_indicators(db, iso3_list)
-        )
-        tasks.append(("worldbank", wb_task))
+    for source, method_name, pass_iso3 in sources:
+        try:
+            module = {"worldbank": worldbank, "owid": owid, "imf": imf}[source]
+            fetcher = getattr(module, method_name)
 
-        # OWID
-        owid_task = asyncio.create_task(
-            owid.fetch_all_indicators(db)
-        )
-        tasks.append(("owid", owid_task))
+            async with async_session_factory() as src_db:
+                async with src_db.begin():
+                    if pass_iso3:
+                        count = await fetcher(src_db, iso3_list)
+                    else:
+                        count = await fetcher(src_db)
 
-        # IMF
-        imf_task = asyncio.create_task(
-            imf.fetch_all_indicators(db)
-        )
-        tasks.append(("imf", imf_task))
+            if source == "worldbank":
+                _last_status.worldbank_count = count
+            elif source == "owid":
+                _last_status.owid_count = count
+            elif source == "imf":
+                _last_status.imf_count = count
 
-        # Wait for all tasks
-        for source, task in tasks:
-            try:
-                count = await task
-                if source == "worldbank":
-                    _last_status.worldbank_count = count
-                elif source == "owid":
-                    _last_status.owid_count = count
-                elif source == "imf":
-                    _last_status.imf_count = count
-            except Exception as e:
-                _last_status.errors.append(f"{source}: {str(e)}")
+        except Exception as e:
+            _last_status.errors.append(f"{source}: {str(e)}")
 
-        _last_status.completed_at = datetime.now(timezone.utc)
-        _last_status.status = "completed" if not _last_status.errors else "completed_with_errors"
-
-    except Exception as e:
-        _last_status.completed_at = datetime.now(timezone.utc)
-        _last_status.status = "failed"
-        _last_status.errors.append(f"Pipeline: {str(e)}")
+    _last_status.completed_at = datetime.now(timezone.utc)
+    _last_status.status = "completed" if not _last_status.errors else "completed_with_errors"
 
     return _last_status
 
 
 async def run_pipeline_standalone(iso3_list: Optional[list[str]] = None) -> DataPipelineStatus:
     """Run pipeline as a standalone script."""
-    async with async_session_factory() as db:
-        async with db.begin():
-            return await run_pipeline(db, iso3_list)
+    return await run_pipeline(iso3_list=iso3_list)
 
 
 def get_last_status() -> Optional[dict]:
