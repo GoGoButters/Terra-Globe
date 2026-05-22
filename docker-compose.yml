@@ -55,6 +55,8 @@ services:
       GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-http://localhost:${NGINX_PORT:-80}/api/auth/google/callback}
       CESIUM_ION_TOKEN: ${CESIUM_ION_TOKEN:-your-cesium-ion-token-here}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:${NGINX_PORT:-80}}
+    volumes:
+      - ./frontend/data:/app/frontend/data:ro
     depends_on:
       db:
         condition: service_healthy

@@ -54,15 +54,24 @@ async def _run_pipeline_background() -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup sequence: migrations → seed → background pipeline."""
-    # 1. Run alembic migrations (blocking — DB must be ready)
-    logger.info("Running alembic migrations...")
-    _run_alembic()
+    try:
+        # 1. Run alembic migrations in a thread (avoids asyncio.run() conflict)
+        logger.info("Running alembic migrations...")
+        await asyncio.to_thread(_run_alembic)
+    except Exception:
+        logger.exception("Alembic migrations failed — continuing anyway")
 
-    # 2. Seed static data (countries, alliances, etc.)
-    await _seed_static_data()
+    try:
+        # 2. Seed static data (countries, alliances, etc.)
+        await _seed_static_data()
+    except Exception:
+        logger.exception("Static data seed failed — continuing anyway")
 
-    # 3. Kick off external data pipeline in background
-    asyncio.create_task(_run_pipeline_background())
+    try:
+        # 3. Kick off external data pipeline in background
+        asyncio.create_task(_run_pipeline_background())
+    except Exception:
+        logger.exception("Background pipeline task failed to start")
 
     yield
 
