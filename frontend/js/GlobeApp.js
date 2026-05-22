@@ -8,6 +8,7 @@ class GlobeApp {
     this.tradeManager = null;
     this.diplomacyManager = null;
     this.authManager = new AuthManager();
+    this._initialized = false;
   }
 
   async start() {
@@ -22,8 +23,29 @@ class GlobeApp {
     // Load config (Cesium token) from API
     await loadConfig();
 
-    // Initialize auth
+    // Set up auth change listener BEFORE init
+    this.authManager.onAuthChange = (isAuthenticated, user) => {
+      if (isAuthenticated && !this._initialized) {
+        this._initializeApp();
+      }
+    };
+
+    // Initialize auth — this checks tokens and shows/dismisses the gate
     await this.authManager.init();
+
+    // If already authenticated, initialize immediately
+    if (this.authManager.isAuthenticated()) {
+      await this._initializeApp();
+    }
+    // Otherwise, the auth gate is visible and _initializeApp will be called
+    // when the user successfully logs in (via onAuthChange callback)
+  }
+
+  async _initializeApp() {
+    if (this._initialized) return;
+    this._initialized = true;
+
+    console.log('🔓 Auth confirmed, initializing TerraGlobe...');
 
     // Load data from API (non-blocking — globe works even if data fails)
     try {

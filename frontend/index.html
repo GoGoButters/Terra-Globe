@@ -12,6 +12,72 @@
   <link rel="stylesheet" href="css/auth.css">
 </head>
 <body>
+  <!-- Auth Gate: Full-screen authentication barrier -->
+  <div id="authGate">
+    <div class="auth-particles" id="authParticles"></div>
+    <div class="auth-gate-card">
+      <div class="auth-brand">
+        <div class="auth-brand-icon">🌍</div>
+        <h1>Terra<span>Globe</span></h1>
+        <p>Интерактивная глобальная платформа данных</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Вход</button>
+        <button class="auth-tab" data-tab="register">Регистрация</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="authLoginForm" class="auth-form">
+        <input type="email" class="auth-input" id="authLoginEmail" placeholder="Email" required autocomplete="email">
+        <input type="password" class="auth-input" id="authLoginPassword" placeholder="Пароль" required minlength="8" autocomplete="current-password">
+        <div class="auth-error" id="authLoginError"></div>
+        <button type="submit" class="auth-submit" id="authLoginSubmit">
+          <span class="btn-text">Войти</span>
+          <div class="spinner"></div>
+        </button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="authRegisterForm" class="auth-form hidden">
+        <input type="text" class="auth-input" id="authRegisterUsername" placeholder="Имя пользователя" required minlength="3" pattern="[a-zA-Z0-9_-]+" autocomplete="username">
+        <input type="email" class="auth-input" id="authRegisterEmail" placeholder="Email" required autocomplete="email">
+        <input type="password" class="auth-input" id="authRegisterPassword" placeholder="Пароль" required minlength="8" autocomplete="new-password">
+        <div class="auth-error" id="authRegisterError"></div>
+        <button type="submit" class="auth-submit" id="authRegisterSubmit">
+          <span class="btn-text">Создать аккаунт</span>
+          <div class="spinner"></div>
+        </button>
+      </form>
+
+      <div class="auth-divider"><span>или</span></div>
+
+      <button id="authGoogleBtn" class="auth-google-btn">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 7.07 5.48 3.56 13.28l7.91 6.16C13.18 12.09 18.16 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.6c-.52-1.56-.82-3.22-.82-4.94s.3-3.38.82-4.94l-7.91-6.16C.97 15.82 0 19.79 0 24s.97 8.18 2.62 11.44l7.91-6.84z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-5.84 0-10.82-3.91-12.53-9.2l-7.91 6.16C7.07 42.52 14.62 48 24 48z"/></svg>
+        Войти через Google
+      </button>
+
+      <div class="auth-features">
+        <div class="auth-feature">
+          <div class="auth-feature-icon">📊</div>
+          <span>200+ индикаторов</span>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">🗺️</div>
+          <span>3D глобус</span>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">🔍</div>
+          <span>Сравнение стран</span>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">🤝</div>
+          <span>Дипломатия</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="cesiumContainer"></div>
 
 <!-- Левая панель: информация о стране -->
