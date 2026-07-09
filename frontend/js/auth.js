@@ -60,9 +60,9 @@ class AuthManager {
     // Login form
     document.getElementById('authLoginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = document.getElementById('authLoginEmail').value;
+      // Hardcoded login — user can't type "@" on their keyboard
       const password = document.getElementById('authLoginPassword').value;
-      await this._submitLogin(email, password);
+      await this._submitLogin('admin@example.com', password);
     });
 
     // Register form
