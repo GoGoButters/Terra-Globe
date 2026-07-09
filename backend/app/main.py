@@ -1,14 +1,12 @@
 import asyncio
 import logging
+import subprocess
 from contextlib import asynccontextmanager
 
-from alembic import command
-from alembic.config import Config
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
-from app.db.session import async_session_factory
 from app.routes import auth, countries, indicators, alliances, trade, diplomacy, admin
 from app.services.data_pipeline import run_pipeline
 from scripts.seed_data import run_seed
@@ -18,9 +16,18 @@ logger = logging.getLogger(__name__)
 
 
 def _run_alembic() -> None:
-    """Run alembic migrations synchronously before app starts."""
-    alembic_cfg = Config("/app/alembic.ini")
-    command.upgrade(alembic_cfg, "head")
+    """Run alembic migrations synchronously via subprocess."""
+    result = subprocess.run(
+        ["alembic", "upgrade", "head"],
+        cwd="/app",
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    if result.returncode != 0:
+        logger.error("Alembic stdout:\n%s", result.stdout)
+        logger.error("Alembic stderr:\n%s", result.stderr)
+        raise RuntimeError(f"Alembic migration failed (code {result.returncode})")
     logger.info("Alembic migrations applied")
 
 
