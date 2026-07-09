@@ -19,7 +19,9 @@ from app.db.session import async_session_factory
 from app.models import (
     Country, IndicatorDefinition, IndicatorValue,
     Alliance, AllianceMember, TradeFlow, DiplomaticRelation,
+    User,
 )
+from app.services.auth_service import get_password_hash
 
 # Path to static data files (relative to project root)
 DATA_DIR = Path(__file__).parent.parent.parent / "frontend" / "data"
@@ -286,9 +288,32 @@ async def run_seed(session: AsyncSession | None = None) -> None:
     print("Database seed complete!")
 
 
+async def seed_user(session: AsyncSession) -> None:
+    """Create admin user if not exists."""
+    result = await session.execute(
+        select(User).where(User.email == "admin@example.com")
+    )
+    if result.scalar_one_or_none():
+        print("  Admin user already exists")
+        return
+
+    admin = User(
+        email="admin@example.com",
+        username="admin",
+        hashed_password=get_password_hash("admin123"),
+        is_active=True,
+        is_superuser=True,
+        full_name="Administrator",
+    )
+    session.add(admin)
+    await session.flush()
+    print("  Created admin user: admin@example.com / admin123")
+
+
 async def _do_seed(session: AsyncSession) -> None:
     """Internal seed logic — runs within an existing transaction."""
     print("Starting database seed...")
+    await seed_user(session)
     await seed_countries(session)
     await seed_indicators(session)
     await seed_alliances(session)
