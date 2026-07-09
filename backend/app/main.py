@@ -1,8 +1,9 @@
 import asyncio
 import logging
-import subprocess
 from contextlib import asynccontextmanager
 
+from alembic import command
+from alembic.config import Config
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -16,18 +17,9 @@ logger = logging.getLogger(__name__)
 
 
 def _run_alembic() -> None:
-    """Run alembic migrations synchronously via subprocess."""
-    result = subprocess.run(
-        ["alembic", "upgrade", "head"],
-        cwd="/app",
-        capture_output=True,
-        text=True,
-        timeout=60,
-    )
-    if result.returncode != 0:
-        logger.error("Alembic stdout:\n%s", result.stdout)
-        logger.error("Alembic stderr:\n%s", result.stderr)
-        raise RuntimeError(f"Alembic migration failed (code {result.returncode})")
+    """Run alembic migrations synchronously (in-process, no PYTHONPATH issue)."""
+    alembic_cfg = Config("/app/alembic.ini")
+    command.upgrade(alembic_cfg, "head")
     logger.info("Alembic migrations applied")
 
 
