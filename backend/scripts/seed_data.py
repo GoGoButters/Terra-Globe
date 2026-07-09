@@ -23,8 +23,13 @@ from app.models import (
 )
 from app.services.auth_service import get_password_hash
 
-# Path to static data files (relative to project root)
-DATA_DIR = Path(__file__).parent.parent.parent / "frontend" / "data"
+# Path to static data files
+# Host:   terra-globe/frontend/data  (script at backend/scripts/)
+# Docker: /app/frontend/data         (script at /app/scripts/)
+_SCRIPT_DIR = Path(__file__).resolve().parent.parent  # backend/ or /app
+DATA_DIR = _SCRIPT_DIR.parent / "frontend" / "data"    # host fallback
+if not DATA_DIR.exists():
+    DATA_DIR = _SCRIPT_DIR / "frontend" / "data"       # docker fallback
 
 
 def _parse_csv(filepath: Path) -> list[dict[str, str]]:

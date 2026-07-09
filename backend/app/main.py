@@ -54,12 +54,9 @@ async def _run_pipeline_background() -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup sequence: migrations → seed → background pipeline."""
-    try:
-        # 1. Run alembic migrations in a thread (avoids asyncio.run() conflict)
-        logger.info("Running alembic migrations...")
-        await asyncio.to_thread(_run_alembic)
-    except Exception:
-        logger.exception("Alembic migrations failed — continuing anyway")
+    # 1. Run alembic migrations
+    logger.info("Running alembic migrations...")
+    await asyncio.to_thread(_run_alembic)
 
     try:
         # 2. Seed static data (countries, alliances, etc.)
@@ -86,8 +83,12 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
-    # ── CORS ──
-    origins = [settings.frontend_url or "http://localhost:80"]
+    # ── CORS — support custom ports (default 80, also 8080, 3000, etc.)
+    base_url = settings.frontend_url or "http://localhost:80"
+    origins = [base_url]
+    for port in ["80", "8080", "3000", "5173", "8000"]:
+        origins.append(f"http://localhost:{port}")
+        origins.append(f"http://127.0.0.1:{port}")
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,

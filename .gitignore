@@ -15,3 +15,9 @@ redis-data/
 .vscode/
 .idea/
 .local/
+.codegraph/
+.omo/
+.maxential/
+/js/
+/css/
+/data/
