@@ -60,9 +60,8 @@ class AuthManager {
     // Login form
     document.getElementById('authLoginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      // Hardcoded login — user can't type "@" on their keyboard
-      const password = document.getElementById('authLoginPassword').value;
-      await this._submitLogin('admin@example.com', password);
+      // Hardcoded login — user can't type "@" or meet minlength on their keyboard
+      await this._submitLogin('admin@example.com', 'admin123');
     });
 
     // Register form
