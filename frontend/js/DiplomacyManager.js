@@ -54,6 +54,188 @@ class DiplomacyManager {
   }
 
   // ─────────────────────────────────────────────────────
+  // Show BILATERAL diplomatic relations between two countries
+  // ─────────────────────────────────────────────────────
+  async showBilateral(iso3_a, iso3_b) {
+    this.clear();
+    this.activeIso3 = iso3_a;
+
+    const countryA = this.dataStore.get(iso3_a);
+    const countryB = this.dataStore.get(iso3_b);
+    const nameA = countryA?.name_ru || countryA?.name || iso3_a;
+    const nameB = countryB?.name_ru || countryB?.name || iso3_b;
+
+    // Loading state
+    document.getElementById('diplomacyTitle').textContent = `🤝 ${nameA} ⟷ ${nameB}`;
+    document.getElementById('diplomacySummary').textContent = 'Загрузка данных об отношениях…';
+    document.getElementById('diplomacyDocs').innerHTML = '';
+
+    let profileA, profileB, bilateral;
+    try {
+      [profileA, profileB, bilateral] = await Promise.all([
+        API.getDiplomacyProfile(iso3_a).catch(() => null),
+        API.getDiplomacyProfile(iso3_b).catch(() => null),
+        API.getDiplomaticRelations(iso3_a, iso3_b).catch(() => null),
+      ]);
+    } catch (e) {
+      console.error('❌ Error loading bilateral data:', e);
+      document.getElementById('diplomacySummary').textContent = '⚠️ Не удалось загрузить данные.';
+      return;
+    }
+
+    this._renderBilateralProfile(iso3_a, iso3_b, nameA, nameB, profileA, profileB, bilateral);
+    document.getElementById('diplomacyPanel').classList.add('visible');
+  }
+
+  _renderBilateralProfile(iso3_a, iso3_b, nameA, nameB, profileA, profileB, bilateral) {
+    const docsEl = document.getElementById('diplomacyDocs');
+    docsEl.innerHTML = '';
+
+    // ── Tone between the two ──
+    let toneData = null;
+    if (profileA?.tone && profileA.tone[iso3_b]) {
+      toneData = profileA.tone[iso3_b];
+    } else if (profileB?.tone && profileB.tone[iso3_a]) {
+      toneData = profileB.tone[iso3_a];
+    }
+
+    // Summary with tone
+    const summaryEl = document.getElementById('diplomacySummary');
+    if (toneData) {
+      const t = toneData.tone;
+      const emoji = t > 3 ? '🟢' : t < -3 ? '🔴' : t < 0 ? '🟡' : '🟢';
+      summaryEl.textContent = `${emoji} Тон отношений: ${t > 0 ? '+' : ''}${t.toFixed(1)} · Упоминаний: ${toneData.count} · ${toneData.trend === 'up' ? '📈' : toneData.trend === 'down' ? '📉' : '➡️'}`;
+    } else {
+      summaryEl.textContent = 'Данные о тоне отношений недоступны';
+    }
+
+    // ── Tone bar card ──
+    if (toneData) {
+      const toneCard = this._createCard();
+      const t = toneData.tone;
+      const barPercent = Math.min(Math.max(((t + 10) / 20) * 100, 5), 95);
+      const barColor = t > 2 ? '#4caf50' : t < -2 ? '#f44336' : '#ffc107';
+      toneCard.innerHTML = `
+        <div class="dip-section-title">📊 Тональность упоминаний в СМИ</div>
+        <div style="margin:10px 0;">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:4px;">
+            <span>🔴 Враждебно (-10)</span><span>Нейтрально (0)</span><span>🟢 Дружественно (+10)</span>
+          </div>
+          <div style="background:linear-gradient(to right,#f44336,#ffc107,#4caf50);height:8px;border-radius:4px;position:relative;">
+            <div style="position:absolute;left:${barPercent}%;top:-4px;width:12px;height:16px;background:${barColor};border:2px solid #fff;border-radius:3px;transform:translateX(-50%);"></div>
+          </div>
+          <div style="text-align:center;margin-top:6px;font-size:18px;font-weight:bold;color:${barColor}">${t > 0 ? '+' : ''}${t.toFixed(1)}</div>
+        </div>
+        <div style="display:flex;justify-content:space-around;font-size:12px;color:rgba(255,255,255,0.6);margin-top:8px;">
+          <span>📰 ${toneData.count} статей</span>
+          <span>📅 7 дней</span>
+        </div>
+      `;
+      docsEl.appendChild(toneCard);
+    }
+
+    // ── Embassies (mutual) ──
+    const aEmbassyInB = profileA?.embassies?.has_embassy_in?.includes(iso3_b);
+    const bEmbassyInA = profileA?.embassies?.embassies_from?.includes(iso3_b);
+    const embCard = this._createCard();
+    embCard.innerHTML = `
+      <div class="dip-section-title">🏛️ Дипломатические миссии</div>
+      <div class="dip-embassy-row">
+        <div class="dip-embassy-item ${aEmbassyInB ? 'dip-embassy-yes' : 'dip-embassy-no'}">
+          ${aEmbassyInB ? '✅' : '❌'} Посольство ${nameA} в ${nameB}
+        </div>
+        <div class="dip-embassy-item ${bEmbassyInA ? 'dip-embassy-yes' : 'dip-embassy-no'}">
+          ${bEmbassyInA ? '✅' : '❌'} Посольство ${nameB} в ${nameA}
+        </div>
+      </div>
+    `;
+    docsEl.appendChild(embCard);
+
+    // ── Bilateral static data (treaties, history) ──
+    if (bilateral && bilateral.summary && bilateral.summary !== 'Данные о дипломатических отношениях пока не загружены') {
+      const bilCard = this._createCard();
+      bilCard.innerHTML = `
+        <div class="dip-section-title">📜 Исторические отношения</div>
+        <p class="dip-text">${bilateral.summary}</p>
+        ${(bilateral.documents || []).slice(0, 5).map(doc => `
+          <div class="dip-doc-line">
+            <strong>${doc.title}</strong>
+            ${doc.year ? `<span class="dip-doc-year">${doc.year}</span>` : ''}
+            ${doc.type ? `<span class="dip-doc-type">${doc.type}</span>` : ''}
+          </div>
+        `).join('')}
+      `;
+      docsEl.appendChild(bilCard);
+    }
+
+    // ── Articles mentioning each other ──
+    if (toneData?.articles && toneData.articles.length > 0) {
+      const artCard = this._createCard();
+      let artHTML = '<div class="dip-section-title">📰 Свежие заголовки</div>';
+      toneData.articles.slice(0, 6).forEach(a => {
+        const toneColor = (a.tone || 0) > 0 ? '#4caf50' : (a.tone || 0) < 0 ? '#f44336' : '#888';
+        artHTML += `
+          <div class="dip-article">
+            <a href="${a.url || '#'}" target="_blank" rel="noopener" class="dip-article-title">${a.title || 'Без заголовка'}</a>
+            <div class="dip-article-meta">
+              <span style="color:${toneColor}">Тон: ${(a.tone || 0).toFixed(1)}</span>
+              ${a.date ? `<span>· ${a.date.slice(0, 10)}</span>` : ''}
+            </div>
+          </div>`;
+      });
+      artCard.innerHTML = artHTML;
+      docsEl.appendChild(artCard);
+    }
+
+    // ── Draw single arc between the two capitals ──
+    const capsData = this.capitalsManager?.capitalsData;
+    if (capsData) {
+      const capA = capsData[iso3_a];
+      const capB = capsData[iso3_b];
+      if (capA && capB) {
+        const toneVal = toneData?.tone || 0;
+        let color;
+        if (toneVal > 3) color = Cesium.Color.fromCssColorString('#4caf50').withAlpha(0.8);
+        else if (toneVal < -3) color = Cesium.Color.fromCssColorString('#f44336').withAlpha(0.8);
+        else color = Cesium.Color.fromCssColorString('#ffc107').withAlpha(0.6);
+
+        const path = this._computeGreatCirclePath(capA.lat, capA.lon, capB.lat, capB.lon, 80);
+        const ARC_HEIGHT = 600000;
+        const positions = path.map((p, i) => {
+          const t = i / (path.length - 1);
+          const h = ARC_HEIGHT * 4 * t * (1 - t);
+          return Cesium.Cartesian3.fromDegrees(p.lon, p.lat, h);
+        });
+
+        this.diplomacyEntities.push(this.viewer.entities.add({
+          polyline: {
+            positions,
+            width: 3,
+            material: color,
+            clampToGround: false,
+          },
+        }));
+
+        // Label at midpoint
+        const mid = path[Math.floor(path.length / 2)];
+        const toneStr = `${toneVal > 0 ? '+' : ''}${toneVal.toFixed(1)}`;
+        this.diplomacyEntities.push(this.viewer.entities.add({
+          position: Cesium.Cartesian3.fromDegrees(mid.lon, mid.lat, ARC_HEIGHT + 80000),
+          label: {
+            text: toneStr,
+            font: 'bold 14px "Segoe UI", sans-serif',
+            fillColor: color,
+            outlineColor: Cesium.Color.BLACK,
+            outlineWidth: 4,
+            style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+            horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
+          },
+        }));
+      }
+    }
+  }
+
+  // ─────────────────────────────────────────────────────
   // Legacy: show relations between two countries
   // ─────────────────────────────────────────────────────
   async showRelations(iso3_1, iso3_2) {

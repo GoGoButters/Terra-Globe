@@ -1128,8 +1128,46 @@ html, body, #cesiumContainer {
   padding: 0;
 }
 .close-card-btn:hover {
-  background: rgba(255,50,50,0.35);
+  background: rgba(255,50,54,0.35);
   color: #fff;
   border-color: rgba(255,80,80,0.8);
   box-shadow: 0 0 8px rgba(255,0,0,0.3);
+}
+
+/* ── Bilateral diplomacy styles ── */
+.dip-embassy-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.dip-embassy-item {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+.dip-embassy-yes {
+  background: rgba(76, 175, 80, 0.15);
+  color: #4caf50;
+}
+.dip-embassy-no {
+  background: rgba(244, 67, 54, 0.15);
+  color: #f44336;
+}
+.dip-doc-line {
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+}
+.dip-doc-year {
+  color: #ffc107;
+  margin-left: 8px;
+  font-size: 11px;
+}
+.dip-doc-type {
+  color: rgba(255,255,255,0.4);
+  margin-left: 8px;
+  font-size: 11px;
+  font-style: italic;
 }

@@ -290,7 +290,8 @@ function setupUI(viewer, layerManager, countryCard, capitalsManager, tradeManage
     firstCountryData = null;
     secondCountryData = null;
     document.getElementById('diplomacyTitle').textContent = 'Выберите страну';
-    document.getElementById('diplomacySummary').textContent = 'Кликните по стране для просмотра дипломатического профиля: посольства, тон отношений, ключевые партнёры.';
+    document.getElementById('diplomacySummary').textContent = 
+        'Шаг 1: кликните по стране. Шаг 2: кликните по второй стране — увидите двусторонние отношения.';
     document.getElementById('diplomacyDocs').innerHTML = '';
   }
 
@@ -353,11 +354,33 @@ function setupUI(viewer, layerManager, countryCard, capitalsManager, tradeManage
       }
 
       if (activeMode === 'diplomacy') {
-        // Single-click shows full diplomatic profile for that country
-        diplomacyManager.showCountryProfile(data.iso3);
-        countryCard.show(data);
-        layerManager.highlight(data.iso3);
-        firstCountryData = data;
+        if (!firstCountryData) {
+          // First click → show full country profile
+          diplomacyManager.showCountryProfile(data.iso3);
+          countryCard.show(data);
+          layerManager.highlight(data.iso3);
+          firstCountryData = data;
+          // Guide user to select second country
+          document.getElementById('diplomacySummary').textContent = 
+            'Выберите вторую страну на глобусе для сравнения отношений';
+        } else if (!secondCountryData && data.iso3 !== firstCountryData.iso3) {
+          // Second click → show BILATERAL relations
+          secondCountryData = data;
+          diplomacyManager.showBilateral(firstCountryData.iso3, data.iso3);
+          countryCard.show(data);
+          layerManager.highlight(data.iso3);
+        } else {
+          // Third click → reset and start over with new first country
+          const oldFirst = firstCountryData;
+          firstCountryData = data;
+          secondCountryData = null;
+          diplomacyManager.clear();
+          diplomacyManager.showCountryProfile(data.iso3);
+          countryCard.show(data);
+          layerManager.highlight(data.iso3);
+          document.getElementById('diplomacySummary').textContent = 
+            'Выберите вторую страну';
+        }
         return;
       }
 
