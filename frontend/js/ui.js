@@ -3,6 +3,8 @@ function setupUI(viewer, layerManager, countryCard, capitalsManager, tradeManage
   let compareMode = false;
   let firstCountryData = null;
   let secondCountryData = null;
+  let _layersBuilt = false;
+  let _alliancesBuilt = false;
 
   const leftPanel = document.getElementById('leftPanel');
   const rightComparePanel = document.getElementById('rightComparePanel');
@@ -82,7 +84,10 @@ function setupUI(viewer, layerManager, countryCard, capitalsManager, tradeManage
     resetModes();
     if (!layerManager.layersData || layerManager.layersData.length === 0) {
       await layerManager.loadLayersData();
+    }
+    if (!_layersBuilt) {
       buildLayersUI();
+      _layersBuilt = true;
     }
     layerManager.setDataVisible(true);
     layersPanel.classList.add('visible');
@@ -133,8 +138,8 @@ function setupUI(viewer, layerManager, countryCard, capitalsManager, tradeManage
         radio.name = 'layer';
         radio.value = layer.key;
         if (layer.key === layerManager.currentLayer) radio.checked = true;
-        radio.addEventListener('change', () => {
-          layerManager.switchLayer(layer.key);
+        radio.addEventListener('change', async () => {
+          await layerManager.switchLayer(layer.key);
           showLayerCard(layer);
         });
         label.appendChild(radio);
@@ -202,7 +207,10 @@ function setupUI(viewer, layerManager, countryCard, capitalsManager, tradeManage
     resetModes();
     if (Object.keys(layerManager.allianceData).length === 0) {
       await layerManager.loadAlliances();
+    }
+    if (!_alliancesBuilt) {
       buildAlliancesUI();
+      _alliancesBuilt = true;
     }
     layerManager.setAllianceMode(true);
     alliancesPanel.classList.add('visible');
@@ -267,6 +275,9 @@ function setupUI(viewer, layerManager, countryCard, capitalsManager, tradeManage
     tradeToggle.classList.add('active');
     tradePanel.classList.add('visible');
     activeMode = 'trade';
+    // Show loading state
+    document.getElementById('tradeCountryName').textContent = 'Выберите страну...';
+    document.getElementById('tradeTopPartners').innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.4);padding:20px;">Кликните по стране для анализа торговли</div>';
   }
 
   // --- Дипломатия ---
@@ -278,19 +289,45 @@ function setupUI(viewer, layerManager, countryCard, capitalsManager, tradeManage
     activeMode = 'diplomacy';
     firstCountryData = null;
     secondCountryData = null;
+    document.getElementById('diplomacyTitle').textContent = 'Выберите две страны';
+    document.getElementById('diplomacySummary').textContent = 'Кликните по первой стране, затем по второй для просмотра дипломатических отношений.';
+    document.getElementById('diplomacyDocs').innerHTML = '';
   }
 
   // --- Клик по глобусу ---
   const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+
+  // Escape key — always deselects highlighted country
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      countryCard.hide();
+      layerManager.clearHighlight();
+      leftPanel.classList.remove('visible');
+    }
+  });
   handler.setInputAction(async function(click) {
     try {
       if (activeMode === 'alliances' || activeMode === 'layers') return;
       const picked = viewer.scene.pick(click.position);
-      if (!Cesium.defined(picked) || !picked.id || !picked.id._customData) {
-        if (!compareMode) { countryCard.hide(); layerManager.clearHighlight(); }
+      // Deselect on background click (ocean, terrain, non-entity)
+      const hasCountryData = Cesium.defined(picked) && picked.id && picked.id._customData;
+      if (!hasCountryData) {
+        if (!compareMode) {
+          countryCard.hide();
+          layerManager.clearHighlight();
+          leftPanel.classList.remove('visible');
+        }
         return;
       }
       const entityData = picked.id._customData;
+
+      // Toggle: click same country → deselect
+      if (entityData.iso3 === layerManager.highlightedIso) {
+        countryCard.hide();
+        layerManager.clearHighlight();
+        leftPanel.classList.remove('visible');
+        return;
+      }
 
       // Fetch full country data from API
       const countryData = await layerManager.dataStore.fetchCountryData(entityData.iso3);
