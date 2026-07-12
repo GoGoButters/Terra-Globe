@@ -74,6 +74,7 @@ services:
       CESIUM_ION_TOKEN: ${CESIUM_ION_TOKEN:-your-cesium-ion-token-here}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:${NGINX_PORT:-80}}
       ALL_PROXY: ${ALL_PROXY:-socks5://xray:1080}
+      NO_PROXY: localhost,127.0.0.1,db,redis,xray
       XRAY_SUBSCRIPTION_URL: ${XRAY_SUBSCRIPTION_URL:-}
     volumes:
       - ./frontend/data:/app/frontend/data:ro
@@ -85,7 +86,7 @@ services:
       xray:
         condition: service_started
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      test: ["CMD", "curl", "-f", "--noproxy", "localhost", "http://localhost:8000/api/health"]
       interval: 10s
       timeout: 5s
       retries: 5
