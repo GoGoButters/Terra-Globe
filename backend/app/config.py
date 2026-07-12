@@ -27,6 +27,10 @@ class Settings(BaseSettings):
     # Frontend
     frontend_url: str = ""
 
+    # Xray Proxy
+    all_proxy: str = ""
+    xray_subscription_url: str = ""
+
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 
     def model_post_init(self, __context) -> None:

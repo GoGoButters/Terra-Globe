@@ -7,7 +7,9 @@ from pydantic import BaseModel
 class CountryBrief(BaseModel):
     iso3: str
     name: str
+    name_ru: Optional[str] = None
     capital_name: Optional[str] = None
+    capital_name_ru: Optional[str] = None
     capital_lat: Optional[float] = None
     capital_lon: Optional[float] = None
 
@@ -18,11 +20,13 @@ class CountryDetail(BaseModel):
     iso3: str
     iso2: Optional[str] = None
     name: str
+    name_ru: Optional[str] = None
     official_name: Optional[str] = None
     region: Optional[str] = None
     subregion: Optional[str] = None
     income_group: Optional[str] = None
     capital_name: Optional[str] = None
+    capital_name_ru: Optional[str] = None
     capital_lat: Optional[float] = None
     capital_lon: Optional[float] = None
     population: Optional[int] = None

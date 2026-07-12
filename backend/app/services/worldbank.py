@@ -16,6 +16,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
 from app.models import IndicatorDefinition, IndicatorValue, APICache
+from app.services.cache import get_cached, set_cache
+from app.services.http_client import get_shared_client
 
 settings = get_settings()
 logger = logging.getLogger(__name__)
@@ -44,7 +46,7 @@ async def _get_cached(cache_key: str, db: AsyncSession) -> Optional[dict]:
         select(APICache).where(
             APICache.source == "worldbank",
             APICache.cache_key == cache_key,
-            APICache.expires_at > datetime.now(timezone.utc),
+            APICache.expires_at > datetime.now(timezone.utc).replace(tzinfo=None),
         )
     )
     cached = result.scalar_one_or_none()
@@ -67,7 +69,7 @@ async def _set_cache(cache_key: str, data: dict, db: AsyncSession) -> None:
         source="worldbank",
         cache_key=cache_key,
         response_data=data,
-        expires_at=datetime.now(timezone.utc) + timedelta(hours=CACHE_TTL_HOURS),
+        expires_at=datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=CACHE_TTL_HOURS),
     )
     db.add(entry)
 
@@ -75,21 +77,21 @@ async def _set_cache(cache_key: str, data: dict, db: AsyncSession) -> None:
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
 async def _fetch_wb_indicator(indicator_code: str, country_code: str = "all") -> list:
     """Fetch indicator data from World Bank API with retry."""
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        resp = await client.get(
-            f"{WB_API_BASE}/country/{country_code}/indicator/{indicator_code}",
-            params={
-                "format": "json",
-                "per_page": 500,
-                "date": "2000:2030",
-            },
-        )
-        resp.raise_for_status()
-        data = resp.json()
-        # WB returns [metadata, [data...]]
-        if isinstance(data, list) and len(data) >= 2:
-            return data[1]
-        return []
+    client = await get_shared_client()
+    resp = await client.get(
+        f"{WB_API_BASE}/country/{country_code}/indicator/{indicator_code}",
+        params={
+            "format": "json",
+            "per_page": 500,
+            "date": "2000:2030",
+        },
+    )
+    resp.raise_for_status()
+    data = resp.json()
+    # WB returns [metadata, [data...]]
+    if isinstance(data, list) and len(data) >= 2:
+        return data[1]
+    return []
 
 
 async def fetch_indicator(
@@ -108,13 +110,19 @@ async def fetch_indicator(
     if cached:
         data = cached
     else:
-        # Filter countries if provided
-        country_param = "all"
-        if iso3_list:
-            # WB API supports semicolon-separated country codes
-            country_param = ";".join(iso3_list[:10])  # Limit to avoid URL length issues
+        # Try Redis cache (fast, 30 min TTL)
+        redis_cached = await get_cached("wb", wb_code)
+        if redis_cached is not None:
+            data = redis_cached
+        else:
+            # Filter countries if provided
+            country_param = "all"
+            if iso3_list:
+                # WB API supports semicolon-separated country codes
+                country_param = ";".join(iso3_list[:10])  # Limit to avoid URL length issues
 
-        data = await _fetch_wb_indicator(wb_code, country_param)
+            data = await _fetch_wb_indicator(wb_code, country_param)
+            await set_cache("wb", wb_code, data, 1800)
         await _set_cache(cache_key, data, db)
 
     results = []

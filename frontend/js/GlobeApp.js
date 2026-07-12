@@ -103,17 +103,44 @@ class GlobeApp {
     console.log('🛰️ Base imagery provider:', il.get(0)?.imageryProvider?.constructor?.name || 'unknown');
     console.log('🛰️ Provider URL:', il.get(0)?.imageryProvider?.url || il.get(0)?.imageryProvider?._resource?.url || 'unknown');
 
-    // ── Set terrain provider (Cesium World Terrain) with fallback ──
+    // ── Set terrain provider (Cesium World Terrain) with proxy fallback ──
+    let terrainLoaded = false;
+
+    // Try 1: Cesium World Terrain via Ion (may be geo-blocked)
     try {
       const terrain = await Promise.race([
         Cesium.CesiumTerrainProvider.fromIonAssetId(1),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Terrain load timeout')), 10000))
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Terrain load timeout')), 8000))
       ]);
       this.viewer.terrainProvider = terrain;
+      terrainLoaded = true;
       console.log('🏔️ Cesium World Terrain loaded');
-    } catch (e) {
-      console.warn('⚠️ World Terrain not available, continuing flat:', e.message);
+    } catch (e1) {
+      console.warn('⚠️ Cesium Ion terrain failed:', e1.message);
+    }
+
+    // Try 2: Cesium terrain via our proxy (bypass geo-blocking)
+    if (!terrainLoaded) {
+      try {
+        const proxyTerrain = await Promise.race([
+          Cesium.CesiumTerrainProvider.fromUrl(
+            '/api/proxy?url=' + encodeURIComponent('https://assets.cesium.com/1/'),
+            { requestVertexNormals: true, requestWaterMask: true }
+          ),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Proxy terrain timeout')), 8000))
+        ]);
+        this.viewer.terrainProvider = proxyTerrain;
+        terrainLoaded = true;
+        console.log('🏔️ Terrain loaded via proxy');
+      } catch (e2) {
+        console.warn('⚠️ Proxy terrain failed:', e2.message);
+      }
+    }
+
+    // Fallback: flat terrain
+    if (!terrainLoaded) {
       this.viewer.terrainProvider = new Cesium.EllipsoidTerrainProvider();
+      console.log('🏔️ Using flat terrain (Ellipsoid)');
     }
 
     // ── Step 3: Scene tuning for realistic satellite look ──

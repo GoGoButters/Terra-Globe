@@ -19,6 +19,9 @@ class CapitalsManager {
         // Validate coordinates
         if (isNaN(cap.lat) || isNaN(cap.lon)) return;
 
+        const capNameRu = this.dataStore.get(iso3)?.capital_name_ru;
+        const displayName = capNameRu || cap.name;
+
         const point = this.viewer.entities.add({
           position: Cesium.Cartesian3.fromDegrees(cap.lon, cap.lat),
           point: {
@@ -29,15 +32,15 @@ class CapitalsManager {
             scaleByDistance: new Cesium.NearFarScalar(1.5e6, 1.0, 1.0e7, 0.5),
             heightReference: Cesium.HeightReference.NONE,
           },
-          description: `<b>${cap.name}</b><br/>Столица`,
+          description: `<b>${displayName}</b><br/>Столица`,
           show: this._visible,
-          _customData: { iso3, name: cap.name, type: 'capital' },
+          _customData: { iso3, name: displayName, type: 'capital' },
         });
 
         const label = this.viewer.entities.add({
           position: Cesium.Cartesian3.fromDegrees(cap.lon, cap.lat),
           label: {
-            text: cap.name,
+            text: displayName,
             font: 'bold 12px "Segoe UI", sans-serif',
             fillColor: Cesium.Color.WHITE,
             outlineColor: Cesium.Color.BLACK,
@@ -48,7 +51,7 @@ class CapitalsManager {
             distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 5000000),
           },
           show: this._visible,
-          _customData: { iso3, name: cap.name, type: 'capitalLabel' },
+          _customData: { iso3, name: displayName, type: 'capitalLabel' },
         });
 
         this._allEntities.push(point, label);

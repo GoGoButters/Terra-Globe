@@ -262,7 +262,7 @@ function setupUI(viewer, layerManager, countryCard, capitalsManager, tradeManage
       const tag = document.createElement('span');
       tag.className = 'member-tag';
       const country = layerManager.dataStore.get(iso3);
-      tag.textContent = country ? country.name : iso3;
+      tag.textContent = country ? (country.name_ru || country.name) : iso3;
       membersDiv.appendChild(tag);
     });
     allianceCard.classList.add('visible');
@@ -412,7 +412,7 @@ function setupUI(viewer, layerManager, countryCard, capitalsManager, tradeManage
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
   function showCompareCountry(data) {
-    compareName.textContent = data.name || '—';
+    compareName.textContent = (data.name_ru || data.name) || '—';
     const im = { high: 'Высокий', 'upper-middle': 'Выше среднего', 'lower-middle': 'Ниже среднего', low: 'Низкий' };
     const income = _val(data, 'income');
     compareIncome.textContent = im[String(income).toLowerCase()] || income || '—';

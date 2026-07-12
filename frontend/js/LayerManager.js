@@ -107,6 +107,7 @@ class LayerManager {
             _customData: {
               iso3,
               name: country.name,
+              name_ru: country.name_ru,
             }
           }));
         } catch (e) {
@@ -184,6 +185,8 @@ class LayerManager {
   _createLabel(iso3, name, ring, allRings) {
     if (!ring || ring.length < 3) return;
 
+    const displayName = this.dataStore.countries[iso3]?.name_ru || name;
+
     // Compute area for font sizing
     let area = 0;
     for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
@@ -213,7 +216,7 @@ class LayerManager {
     this.labels[iso3] = this.viewer.entities.add({
       position: Cesium.Cartesian3.fromDegrees(centroidLon, centroidLat, 0),
       label: {
-        text: name,
+        text: displayName,
         font: `bold ${fontSize}px "Inter", "Segoe UI", sans-serif`,
         fillColor: Cesium.Color.WHITE.withAlpha(0.9),
         outlineColor: new Cesium.Color(0, 0, 0, 0.6),
@@ -225,7 +228,7 @@ class LayerManager {
         translucencyByDistance: new Cesium.NearFarScalar(3e6, 1.0, farDist * 0.7, 0.0),
         pixelOffset: new Cesium.Cartesian2(0, 2),
       },
-      _customData: { iso3, name, type: 'label' },
+      _customData: { iso3, name: displayName, type: 'label' },
     });
   }
 

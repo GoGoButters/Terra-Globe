@@ -100,12 +100,15 @@ async def get_indicator_map(
     values = {row[0]: row[1] for row in result.all() if row[1] is not None}
 
     # Determine the year used
-    if year is None and values:
-        year_result = await db.execute(
-            select(func.max(IndicatorValue.year)).where(
-                IndicatorValue.indicator_code == code
+    if year is None:
+        if values:
+            year_result = await db.execute(
+                select(func.max(IndicatorValue.year)).where(
+                    IndicatorValue.indicator_code == code
+                )
             )
-        )
-        year = year_result.scalar_one() or 0
+            year = year_result.scalar_one() or 0
+        else:
+            year = 0
 
     return IndicatorMapResponse(indicator_code=code, year=year, values=values)

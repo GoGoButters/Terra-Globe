@@ -18,6 +18,8 @@ from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import IndicatorDefinition, IndicatorValue, APICache
+from app.services.cache import get_cached, set_cache
+from app.services.http_client import get_shared_client
 
 logger = logging.getLogger(__name__)
 
@@ -288,7 +290,7 @@ async def _get_cached(cache_key: str, db: AsyncSession) -> Optional[dict]:
         select(APICache).where(
             APICache.source == "owid",
             APICache.cache_key == cache_key,
-            APICache.expires_at > datetime.now(timezone.utc),
+            APICache.expires_at > datetime.now(timezone.utc).replace(tzinfo=None),
         )
     )
     cached = result.scalar_one_or_none()
@@ -307,7 +309,7 @@ async def _set_cache(cache_key: str, data: dict, db: AsyncSession) -> None:
         source="owid",
         cache_key=cache_key,
         response_data=data,
-        expires_at=datetime.now(timezone.utc) + timedelta(hours=CACHE_TTL_HOURS),
+        expires_at=datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=CACHE_TTL_HOURS),
     )
     db.add(entry)
 
@@ -319,16 +321,16 @@ async def _fetch_owid_dataset(dataset_key: str) -> Optional[pd.DataFrame]:
     if not dataset:
         return None
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        resp = await client.get(dataset["url"])
-        resp.raise_for_status()
+    client = await get_shared_client()
+    resp = await client.get(dataset["url"])
+    resp.raise_for_status()
 
-        # Try to parse CSV
-        try:
-            df = pd.read_csv(io.StringIO(resp.text))
-            return df
-        except Exception:
-            return None
+    # Try to parse CSV
+    try:
+        df = pd.read_csv(io.StringIO(resp.text))
+        return df
+    except Exception:
+        return None
 
 
 async def fetch_indicator(
@@ -348,10 +350,16 @@ async def fetch_indicator(
         # Reconstruct DataFrame from cached data
         df = pd.DataFrame(cached.get("data", []))
     else:
-        df = await _fetch_owid_dataset(our_code)
-        if df is None:
-            return []
-        # Cache the data
+        # Try Redis cache (fast, 30 min TTL)
+        redis_cached = await get_cached("owid", our_code)
+        if redis_cached is not None:
+            df = pd.DataFrame(redis_cached.get("data", []))
+        else:
+            df = await _fetch_owid_dataset(our_code)
+            if df is None:
+                return []
+            # Cache in Redis (fast) and DB (durable)
+            await set_cache("owid", our_code, {"data": df.to_dict(orient="records")}, 1800)
         await _set_cache(cache_key, {"data": df.to_dict(orient="records")}, db)
 
     results = []

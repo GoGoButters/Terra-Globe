@@ -36,7 +36,7 @@ def get_password_hash(password: str) -> str:
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + (
+    expire = datetime.now(timezone.utc).replace(tzinfo=None) + (
         expires_delta or timedelta(minutes=settings.access_token_expire_minutes)
     )
     to_encode.update({"exp": expire, "type": "access"})
@@ -45,7 +45,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
 
 def create_refresh_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + (
+    expire = datetime.now(timezone.utc).replace(tzinfo=None) + (
         expires_delta or timedelta(days=settings.refresh_token_expire_days)
     )
     to_encode.update({"exp": expire, "type": "refresh", "jti": str(uuid4())})
@@ -116,7 +116,7 @@ async def store_refresh_token(user_id: str, token: str, db: AsyncSession) -> Non
     rt = RefreshToken(
         user_id=user_id,
         token_hash=hash_token(token),
-        expires_at=datetime.now(timezone.utc) + timedelta(days=settings.refresh_token_expire_days),
+        expires_at=datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(days=settings.refresh_token_expire_days),
     )
     db.add(rt)
 
@@ -156,7 +156,7 @@ async def validate_refresh_token(token: str, db: AsyncSession) -> Optional[User]
             return None
 
         # Check expiry
-        if rt.expires_at < datetime.now(timezone.utc):
+        if rt.expires_at < datetime.now(timezone.utc).replace(tzinfo=None):
             return None
 
         # Get user

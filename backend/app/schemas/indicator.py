@@ -31,5 +31,5 @@ class IndicatorValueResponse(BaseModel):
 
 class IndicatorMapResponse(BaseModel):
     indicator_code: str
-    year: int
+    year: Optional[int] = None
     values: dict[str, float]  # {iso3: value}

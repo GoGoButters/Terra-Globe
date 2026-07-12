@@ -8,7 +8,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
-from app.routes import auth, countries, indicators, alliances, trade, diplomacy, admin
+from app.routes import auth, countries, indicators, alliances, trade, diplomacy, admin, proxy as proxy_routes
 from app.services.data_pipeline import run_pipeline
 from scripts.seed_data import run_seed
 
@@ -104,6 +104,7 @@ def create_app() -> FastAPI:
     app.include_router(trade.router, prefix="/api", tags=["trade"])
     app.include_router(diplomacy.router, prefix="/api", tags=["diplomacy"])
     app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
+    app.include_router(proxy_routes.router, prefix="/api", tags=["proxy"])
 
     # ── Health check ──
     @app.get("/api/health")

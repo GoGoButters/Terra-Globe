@@ -1,14 +1,14 @@
 """Pydantic schemas for trade endpoints."""
 
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class TradePartner(BaseModel):
     iso3: str
     name: Optional[str] = None
     export: float = 0.0
-    import_: float = 0.0
+    import_: float = Field(0.0, alias="import")
 
 
 class TradeCategory(BaseModel):

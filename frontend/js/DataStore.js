@@ -3,12 +3,14 @@ class DataStore {
     this.countries = {};
     this.nameToIso3 = {};
     this.isReady = false;
+    // Cache of indicator values: { layerCode: { iso3: value } }
+    this.indicatorCache = {};
   }
 
   async load() {
     try {
-      // Fetch GeoJSON from API instead of static file
-      const geojson = await API.getCountriesGeoJSON();
+      // Fetch GeoJSON with simplification for performance
+      const geojson = await API.getCountriesGeoJSON(0.05);
       if (!geojson || geojson.type !== 'FeatureCollection' || !Array.isArray(geojson.features)) {
         console.error('❌ Invalid GeoJSON response from API');
         return;
@@ -33,18 +35,18 @@ class DataStore {
           return;
         }
 
-        // Find country data from API response
         const countryData = countriesList.find(c => c.iso3 === iso3);
 
         this.countries[iso3] = {
           iso3: iso3,
           name: countryData ? countryData.name : (feature.properties.name || ''),
+          name_ru: countryData ? countryData.name_ru : (feature.properties.name_ru || null),
           geometry: feature.geometry,
-          // Additional data will be fetched on-demand via API.getCountry(iso3)
         };
 
         if (countryData) {
           this.countries[iso3].capital_name = countryData.capital_name;
+          this.countries[iso3].capital_name_ru = countryData.capital_name_ru;
           this.countries[iso3].capital_lat = countryData.capital_lat;
           this.countries[iso3].capital_lon = countryData.capital_lon;
         }
@@ -67,7 +69,6 @@ class DataStore {
   async fetchCountryData(iso3) {
     try {
       const data = await API.getCountry(iso3);
-      // Merge with existing country data
       if (this.countries[iso3]) {
         this.countries[iso3] = { ...this.countries[iso3], ...data };
       } else {
@@ -81,8 +82,38 @@ class DataStore {
   }
 
   /**
-   * Extracts three-letter ISO3 code from GeoJSON properties.
+   * Load or get cached indicator values for a specific layer.
+   * Returns { iso3: value } map.
    */
+  async getIndicatorMap(code) {
+    if (this.indicatorCache[code]) {
+      return this.indicatorCache[code];
+    }
+    try {
+      const result = await API.getIndicatorMap(code);
+      const map = result.values || {};
+      this.indicatorCache[code] = map;
+      return map;
+    } catch (e) {
+      console.warn(`⚠️ Failed to load indicator map for "${code}":`, e.message);
+      return {};
+    }
+  }
+
+  /**
+   * Pre-load indicator values for the default layers.
+   */
+  async preloadIndicatorMaps(codes) {
+    const promises = codes.map(code =>
+      API.getIndicatorMap(code)
+        .then(result => {
+          this.indicatorCache[code] = result.values || {};
+        })
+        .catch(() => {})
+    );
+    await Promise.allSettled(promises);
+  }
+
   extractISO3(props) {
     const code = props['ISO3166-1-Alpha-3'] ||
                  props.ISO_A3 ||

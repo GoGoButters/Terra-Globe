@@ -12,7 +12,7 @@ from app.schemas.trade import TradeSummary, TradePartnersResponse, TradeCategori
 router = APIRouter()
 
 
-@router.get("/trade/{iso3}")
+@router.get("/trade/{iso3}", response_model=TradeSummary)
 async def get_trade_summary(
     iso3: str,
     year: Optional[int] = Query(None, description="Year (default: latest)"),
@@ -30,7 +30,7 @@ async def get_trade_summary(
         year_result = await db.execute(
             select(func.max(TradeFlow.year)).where(TradeFlow.reporter_iso3 == iso3)
         )
-        year = year_result.scalar_one() or 2024
+        year = year_result.scalar_one_or_none() or 2024
 
     # Aggregate trade data
     result = await db.execute(
@@ -56,7 +56,7 @@ async def get_trade_summary(
     )
 
 
-@router.get("/trade/{iso3}/partners")
+@router.get("/trade/{iso3}/partners", response_model=TradePartnersResponse)
 async def get_trade_partners(
     iso3: str,
     year: Optional[int] = Query(None, description="Year (default: latest)"),
@@ -75,7 +75,7 @@ async def get_trade_partners(
         year_result = await db.execute(
             select(func.max(TradeFlow.year)).where(TradeFlow.reporter_iso3 == iso3)
         )
-        year = year_result.scalar_one() or 2024
+        year = year_result.scalar_one_or_none() or 2024
 
     # Get top partners by total turnover
     result = await db.execute(
@@ -111,7 +111,7 @@ async def get_trade_partners(
     return {"reporter_iso3": iso3, "year": year, "partners": partners}
 
 
-@router.get("/trade/{iso3}/categories")
+@router.get("/trade/{iso3}/categories", response_model=TradeCategoriesResponse)
 async def get_trade_categories(
     iso3: str,
     year: Optional[int] = Query(None, description="Year (default: latest)"),
@@ -129,7 +129,7 @@ async def get_trade_categories(
         year_result = await db.execute(
             select(func.max(TradeFlow.year)).where(TradeFlow.reporter_iso3 == iso3)
         )
-        year = year_result.scalar_one() or 2024
+        year = year_result.scalar_one_or_none() or 2024
 
     # Get all flows for this country/year
     result = await db.execute(

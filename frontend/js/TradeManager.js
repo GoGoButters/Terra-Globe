@@ -18,6 +18,10 @@ class TradeManager {
     this.clear();
     this.activeIso3 = iso3;
 
+    // Fetch country name
+    const countryData = await this.dataStore.fetchCountryData(iso3);
+    const countryName = countryData ? (countryData.name_ru || countryData.name) : iso3;
+
     // Fetch trade data from API
     let summary, partners, categories;
     try {
@@ -28,15 +32,16 @@ class TradeManager {
       ]);
     } catch (e) {
       console.error(`❌ Error fetching trade data for ${iso3}:`, e);
+      document.getElementById('tradeCountryName').textContent = countryName || iso3;
+      document.getElementById('tradeTopPartners').innerHTML = '<div style="color:rgba(255,100,100,0.7);padding:16px;text-align:center;">⚠️ Данные о торговле недоступны<br><small>Проверьте подключение к серверу</small></div>';
+      document.getElementById('tradeTopExports').innerHTML = '';
+      document.getElementById('tradeTopImports').innerHTML = '';
+      document.getElementById('tradePanel').classList.add('visible');
       return;
     }
 
     const sourceCapital = this._getCapitalCoords(iso3);
     if (!sourceCapital) return;
-
-    // Fetch country name
-    const countryData = await this.dataStore.fetchCountryData(iso3);
-    const countryName = countryData ? countryData.name : iso3;
 
     // Build combined data object for UI
     const data = {
@@ -239,7 +244,7 @@ class TradeManager {
   }
 
   _fillLeftPanel(data) {
-    document.getElementById('tradeCountryName').textContent = data.name || '—';
+    document.getElementById('tradeCountryName').textContent = (data.name_ru || data.name) || '—';
 
     const totalExports = data.total_exports ?? 0;
     const totalImports = data.total_imports ?? 0;
@@ -269,7 +274,9 @@ class TradeManager {
       const total = expVal + impVal;
       const div = document.createElement('div');
       div.className = 'trade-item';
-      div.innerHTML = `<span>${partner.name || partner.iso3}</span><span>$${total.toLocaleString()} млрд</span>`;
+      const partnerCountry = this.dataStore.get(partner.iso3);
+      const partnerDisplayName = partnerCountry?.name_ru || partner.name || partner.iso3;
+      div.innerHTML = `<span>${partnerDisplayName}</span><span>$${total.toLocaleString()} млрд</span>`;
       partnersDiv.appendChild(div);
     });
 

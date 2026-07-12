@@ -37,8 +37,8 @@ class DiplomacyManager {
   _showNoData(iso3_1, iso3_2) {
     const country1 = this.dataStore.get(iso3_1);
     const country2 = this.dataStore.get(iso3_2);
-    const name1 = country1 ? country1.name : iso3_1;
-    const name2 = country2 ? country2.name : iso3_2;
+    const name1 = country1 ? (country1.name_ru || country1.name) : iso3_1;
+    const name2 = country2 ? (country2.name_ru || country2.name) : iso3_2;
 
     document.getElementById('diplomacyTitle').textContent = `${name1} — ${name2}`;
     document.getElementById('diplomacySummary').textContent = 'Данные о дипломатических отношениях пока не загружены для этой пары стран.';
@@ -47,8 +47,10 @@ class DiplomacyManager {
   }
 
   _fillPanel(data) {
-    const name1 = data.country1_name || data.country1_iso3;
-    const name2 = data.country2_name || data.country2_iso3;
+    const ds1 = this.dataStore.get(data.country1_iso3);
+    const ds2 = this.dataStore.get(data.country2_iso3);
+    const name1 = ds1?.name_ru || data.country1_name || data.country1_iso3;
+    const name2 = ds2?.name_ru || data.country2_name || data.country2_iso3;
 
     document.getElementById('diplomacyTitle').textContent = `${name1} — ${name2}`;
     document.getElementById('diplomacySummary').textContent = data.summary || '';

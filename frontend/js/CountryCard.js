@@ -44,7 +44,8 @@ class CountryCard {
   }
 
   show(data) {
-    this.nameEl.textContent = data.name || '—';
+    const displayName = data.name_ru || data.name || '—';
+    this.nameEl.textContent = displayName;
 
     const incomeMap = { 'high': 'Высокий', 'upper-middle': 'Выше среднего', 'lower-middle': 'Ниже среднего', 'low': 'Низкий' };
     const income = this._val(data, 'income');

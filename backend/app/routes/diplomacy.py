@@ -12,7 +12,7 @@ from app.schemas.diplomacy import DiplomaticRelationResponse
 router = APIRouter()
 
 
-@router.get("/diplomacy")
+@router.get("/diplomacy", response_model=list[DiplomaticRelationResponse])
 async def list_diplomacy(
     country: Optional[str] = Query(None, description="Filter by country ISO3"),
     db: AsyncSession = Depends(get_db),
@@ -64,7 +64,7 @@ async def list_diplomacy(
     return response
 
 
-@router.get("/diplomacy/{iso3_a}/{iso3_b}")
+@router.get("/diplomacy/{iso3_a}/{iso3_b}", response_model=DiplomaticRelationResponse)
 async def get_diplomatic_relations(
     iso3_a: str,
     iso3_b: str,

@@ -37,8 +37,8 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime, server_default=sa.func.now(), onupdate=sa.func.now()),
     )
     op.create_index("idx_countries_name", "countries", ["name"])
-    op.create_index("idx_countries_geometry", "countries", ["geometry"], postgresql_using="gist")
-    op.create_index("idx_countries_centroid", "countries", ["centroid"], postgresql_using="gist")
+    op.execute("CREATE INDEX IF NOT EXISTS idx_countries_geometry ON countries USING gist (geometry)")
+    op.execute("CREATE INDEX IF NOT EXISTS idx_countries_centroid ON countries USING gist (centroid)")
 
     # ── indicator_definitions ──
     op.create_table(
@@ -48,7 +48,7 @@ def upgrade() -> None:
         sa.Column("description", sa.Text, nullable=True),
         sa.Column("category", sa.String(50), nullable=True),
         sa.Column("unit", sa.String(50), nullable=True),
-        sa.Column("source", sa.String(20), nullable=True),
+        sa.Column("source", sa.String(100), nullable=True),
         sa.Column("source_code", sa.String(50), nullable=True),
         sa.Column("source_url", sa.String(500), nullable=True),
         sa.Column("methodology", sa.Text, nullable=True),

@@ -31,7 +31,10 @@ class Country(Base):
     geometry = Column(Geometry("MULTIPOLYGON", srid=4326), nullable=True)
     centroid = Column(Geometry("POINT", srid=4326), nullable=True)
 
+    name_ru = Column(String(200), nullable=True)
+
     capital_name = Column(String(100), nullable=True)
+    capital_name_ru = Column(String(200), nullable=True)
     capital_lat = Column(Float, nullable=True)
     capital_lon = Column(Float, nullable=True)
 
@@ -62,7 +65,7 @@ class IndicatorDefinition(Base):
     category = Column(String(50), nullable=True, index=True)
     unit = Column(String(50), nullable=True)
 
-    source = Column(String(20), nullable=True)  # worldbank, owid, imf
+    source = Column(String(100), nullable=True)  # worldbank, owid, imf
     source_code = Column(String(50), nullable=True)
     source_url = Column(String(500), nullable=True)
 

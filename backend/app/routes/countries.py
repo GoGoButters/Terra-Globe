@@ -20,7 +20,8 @@ async def list_countries(
     db: AsyncSession = Depends(get_db),
 ):
     """List all countries, optionally filtered by bounding box."""
-    query = select(Country.iso3, Country.name, Country.capital_name,
+    query = select(Country.iso3, Country.name, Country.name_ru,
+                   Country.capital_name, Country.capital_name_ru,
                    Country.capital_lat, Country.capital_lon)
 
     if bbox:
@@ -39,47 +40,12 @@ async def list_countries(
     result = await db.execute(query.order_by(Country.name))
     return [
         CountryBrief(
-            iso3=row[0], name=row[1], capital_name=row[2],
-            capital_lat=row[3], capital_lon=row[4],
+            iso3=row[0], name=row[1], name_ru=row[2],
+            capital_name=row[3], capital_name_ru=row[4],
+            capital_lat=row[5], capital_lon=row[6],
         )
         for row in result.all()
     ]
-
-
-@router.get("/countries/{iso3}", response_model=CountryDetail)
-async def get_country(iso3: str, db: AsyncSession = Depends(get_db)):
-    """Get country details with latest indicator values."""
-    result = await db.execute(
-        select(Country).where(Country.iso3 == iso3)
-    )
-    country = result.scalar_one_or_none()
-    if not country:
-        raise HTTPException(status_code=404, detail="Country not found")
-
-    # Get latest indicator values
-    indicator_result = await db.execute(
-        select(IndicatorValue.indicator_code, IndicatorValue.value)
-        .where(IndicatorValue.country_iso3 == iso3)
-        .order_by(IndicatorValue.year.desc())
-        .distinct(IndicatorValue.indicator_code)
-    )
-    indicators = {row[0]: row[1] for row in indicator_result.all() if row[1] is not None}
-
-    return CountryDetail(
-        iso3=country.iso3,
-        iso2=country.iso2,
-        name=country.name,
-        official_name=country.official_name,
-        region=country.region,
-        subregion=country.subregion,
-        income_group=country.income_group,
-        capital_name=country.capital_name,
-        capital_lat=country.capital_lat,
-        capital_lon=country.capital_lon,
-        population=country.population,
-        area_km2=country.area_km2,
-        indicators=indicators,
-    )
 
 
 @router.get("/countries/geojson")
@@ -99,6 +65,7 @@ async def get_countries_geojson(
                             'properties', jsonb_build_object(
                                 'iso3', c.iso3,
                                 'name', c.name,
+                                'name_ru', c.name_ru,
                                 'ISO3166-1-Alpha-3', c.iso3
                             ),
                             'geometry', ST_AsGeoJSON(ST_Simplify(c.geometry, :tol))::jsonb
@@ -119,6 +86,7 @@ async def get_countries_geojson(
                             'properties', jsonb_build_object(
                                 'iso3', c.iso3,
                                 'name', c.name,
+                                'name_ru', c.name_ru,
                                 'ISO3166-1-Alpha-3', c.iso3
                             ),
                             'geometry', ST_AsGeoJSON(c.geometry)::jsonb
@@ -141,3 +109,41 @@ async def get_countries_geojson(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"GeoJSON generation failed: {str(e)}")
+
+
+@router.get("/countries/{iso3}", response_model=CountryDetail)
+async def get_country(iso3: str, db: AsyncSession = Depends(get_db)):
+    """Get country details with latest indicator values."""
+    result = await db.execute(
+        select(Country).where(Country.iso3 == iso3)
+    )
+    country = result.scalar_one_or_none()
+    if not country:
+        raise HTTPException(status_code=404, detail="Country not found")
+
+    # Get latest indicator values
+    indicator_result = await db.execute(
+        select(IndicatorValue.indicator_code, IndicatorValue.value)
+        .where(IndicatorValue.country_iso3 == iso3)
+        .distinct(IndicatorValue.indicator_code)
+        .order_by(IndicatorValue.indicator_code, IndicatorValue.year.desc())
+    )
+    indicators = {row[0]: row[1] for row in indicator_result.all() if row[1] is not None}
+
+    return CountryDetail(
+        iso3=country.iso3,
+        iso2=country.iso2,
+        name=country.name,
+        name_ru=country.name_ru,
+        official_name=country.official_name,
+        region=country.region,
+        subregion=country.subregion,
+        income_group=country.income_group,
+        capital_name=country.capital_name,
+        capital_name_ru=country.capital_name_ru,
+        capital_lat=country.capital_lat,
+        capital_lon=country.capital_lon,
+        population=country.population,
+        area_km2=country.area_km2,
+        indicators=indicators,
+    )

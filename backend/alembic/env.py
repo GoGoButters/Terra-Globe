@@ -1,8 +1,14 @@
 import asyncio
+import sys
+from pathlib import Path
 from logging.config import fileConfig
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
+
+# Ensure /app is on sys.path so that "from app.models import Base" works
+# when alembic loads env.py outside of uvicorn (e.g. via command.upgrade).
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from app.models import Base
 from app.config import get_settings
