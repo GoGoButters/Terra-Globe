@@ -297,61 +297,56 @@ function setupUI(viewer, layerManager, countryCard, capitalsManager, tradeManage
   // --- Клик по глобусу ---
   const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
 
-  // Escape key — always deselects highlighted country
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      countryCard.hide();
-      layerManager.clearHighlight();
-      leftPanel.classList.remove('visible');
-      viewer.scene.requestRender();
-    }
-  });
-
-  // Right-click on globe → always deselect (bypasses scene.pick entirely)
-  viewer.scene.canvas.addEventListener('contextmenu', (e) => {
-    e.preventDefault();
+  // Shared deselect helper — called by ALL deselection methods
+  function _deselect() {
     countryCard.hide();
     layerManager.clearHighlight();
     leftPanel.classList.remove('visible');
     viewer.scene.requestRender();
-  });
-
-  // Close button (✕) on country card → deselect
-  const closeBtn = document.getElementById('closeCountryCard');
-  if (closeBtn) {
-    closeBtn.addEventListener('click', () => {
-      countryCard.hide();
-      layerManager.clearHighlight();
-      leftPanel.classList.remove('visible');
-      viewer.scene.requestRender();
-    });
+    console.log('🔓 Deselected');
   }
 
+  // Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') _deselect();
+  });
+
+  // Close button (✕) on country card
+  const closeBtn = document.getElementById('closeCountryCard');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', _deselect);
+  }
+
+  // Right-click anywhere on canvas
+  viewer.scene.canvas.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    _deselect();
+  });
+
+  // MAIN LEFT-CLICK handler — select OR deselect
   handler.setInputAction(async function(click) {
     try {
       if (activeMode === 'alliances' || activeMode === 'layers') return;
-      const picked = viewer.scene.pick(click.position);
-      // Deselect on background click (ocean, terrain, non-entity)
-      const hasCountryData = Cesium.defined(picked) && picked.id && picked.id._customData;
-      if (!hasCountryData) {
-        if (!compareMode) {
-          countryCard.hide();
-          layerManager.clearHighlight();
-          leftPanel.classList.remove('visible');
-          viewer.scene.requestRender();
-        }
-        return;
-      }
-      const entityData = picked.id._customData;
 
-      // Toggle: click same country → deselect
-      if (entityData.iso3 === layerManager.highlightedIso) {
-        countryCard.hide();
-        layerManager.clearHighlight();
-        leftPanel.classList.remove('visible');
-        viewer.scene.requestRender();
+      // Use drillPick to get ALL objects at click position (including terrain)
+      const allPicks = viewer.scene.drillPick(click.position);
+      const countryPick = allPicks.find(p => p.id && p.id._customData && p.id._customData.iso3);
+
+      // No country entity hit → deselect
+      if (!countryPick) {
+        if (!compareMode) _deselect();
         return;
       }
+
+      const entityData = countryPick.id._customData;
+
+      // Same country → toggle deselect
+      if (entityData.iso3 === layerManager.highlightedIso) {
+        _deselect();
+        return;
+      }
+
+      // --- Different country → select ---
 
       // Fetch full country data from API
       const countryData = await layerManager.dataStore.fetchCountryData(entityData.iso3);
@@ -411,6 +406,7 @@ function setupUI(viewer, layerManager, countryCard, capitalsManager, tradeManage
           layerManager.highlight(firstCountryData.iso3);
         }
       } else {
+        // Default mode: show country card
         countryCard.show(data);
         layerManager.highlight(data.iso3);
         leftPanel.classList.add('visible');

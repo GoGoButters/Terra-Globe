@@ -394,8 +394,9 @@ class LayerManager {
   highlight(iso3) {
     if (this.highlightedIso && this.highlightedIso !== iso3) {
       (this.entities[this.highlightedIso] || []).forEach(e => {
-        e.polygon.outlineColor = Cesium.Color.WHITE.withAlpha(0.25);
-        e.polygon.outlineWidth = 1.0;
+        e.polygon.outlineColor = Cesium.Color.WHITE.withAlpha(0.45);
+        e.polygon.outlineWidth = 1.5;
+        e.polygon.material = Cesium.Color.WHITE.withAlpha(0.01);
       });
     }
     (this.entities[iso3] || []).forEach(e => {
@@ -411,6 +412,7 @@ class LayerManager {
       (this.entities[this.highlightedIso] || []).forEach(e => {
         e.polygon.outlineColor = Cesium.Color.WHITE.withAlpha(0.45);
         e.polygon.outlineWidth = 1.5;
+        e.polygon.material = Cesium.Color.WHITE.withAlpha(0.01);
       });
       this.highlightedIso = null;
       this.viewer.scene.requestRender();

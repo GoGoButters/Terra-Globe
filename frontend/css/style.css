@@ -964,15 +964,15 @@ html, body, #cesiumContainer {
 /* Close button on country card */
 .close-card-btn {
   position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 30px;
-  height: 30px;
-  border: none;
-  background: rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.5);
-  border-radius: 50%;
-  font-size: 15px;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255,80,80,0.4);
+  background: rgba(255,50,50,0.15);
+  color: #ff6060;
+  border-radius: 8px;
+  font-size: 16px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -983,6 +983,8 @@ html, body, #cesiumContainer {
   padding: 0;
 }
 .close-card-btn:hover {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255,50,50,0.35);
   color: #fff;
+  border-color: rgba(255,80,80,0.8);
+  box-shadow: 0 0 8px rgba(255,0,0,0.3);
 }
