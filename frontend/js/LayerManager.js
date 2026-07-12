@@ -413,6 +413,7 @@ class LayerManager {
         e.polygon.outlineWidth = 1.5;
       });
       this.highlightedIso = null;
+      this.viewer.scene.requestRender();
     }
   }
 

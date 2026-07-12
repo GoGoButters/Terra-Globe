@@ -303,8 +303,30 @@ function setupUI(viewer, layerManager, countryCard, capitalsManager, tradeManage
       countryCard.hide();
       layerManager.clearHighlight();
       leftPanel.classList.remove('visible');
+      viewer.scene.requestRender();
     }
   });
+
+  // Right-click on globe → always deselect (bypasses scene.pick entirely)
+  viewer.scene.canvas.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    countryCard.hide();
+    layerManager.clearHighlight();
+    leftPanel.classList.remove('visible');
+    viewer.scene.requestRender();
+  });
+
+  // Close button (✕) on country card → deselect
+  const closeBtn = document.getElementById('closeCountryCard');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      countryCard.hide();
+      layerManager.clearHighlight();
+      leftPanel.classList.remove('visible');
+      viewer.scene.requestRender();
+    });
+  }
+
   handler.setInputAction(async function(click) {
     try {
       if (activeMode === 'alliances' || activeMode === 'layers') return;
@@ -316,6 +338,7 @@ function setupUI(viewer, layerManager, countryCard, capitalsManager, tradeManage
           countryCard.hide();
           layerManager.clearHighlight();
           leftPanel.classList.remove('visible');
+          viewer.scene.requestRender();
         }
         return;
       }
@@ -326,6 +349,7 @@ function setupUI(viewer, layerManager, countryCard, capitalsManager, tradeManage
         countryCard.hide();
         layerManager.clearHighlight();
         leftPanel.classList.remove('visible');
+        viewer.scene.requestRender();
         return;
       }
 

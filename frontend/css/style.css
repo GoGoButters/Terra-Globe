@@ -1,3 +1,22 @@
+/* ── Design Tokens ── */
+:root {
+  --accent: #00d4ff;
+  --accent-glow: rgba(0, 212, 255, 0.15);
+  --accent-soft: rgba(0, 212, 255, 0.08);
+  --bg-panel: rgba(10, 10, 20, 0.92);
+  --bg-panel-soft: rgba(10, 10, 20, 0.85);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(0, 212, 255, 0.3);
+  --text-primary: #fff;
+  --text-secondary: rgba(255, 255, 255, 0.65);
+  --text-muted: rgba(255, 255, 255, 0.35);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --panel-width: 300px;
+  --transition-smooth: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 /* Общие сбросы */
 html, body, #cesiumContainer {
   width: 100%;
@@ -6,7 +25,10 @@ html, body, #cesiumContainer {
   padding: 0;
   overflow: hidden;
   font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #050510;
 }
+
+/* Removed grain overlay for better performance */
 
 /* Левая информационная панель */
 #leftPanel {
@@ -33,6 +55,7 @@ html, body, #cesiumContainer {
 #leftPanel.visible {
   transform: translateX(0);
   opacity: 1;
+  box-shadow: 4px 0 40px rgba(0, 0, 0, 0.7), 1px 0 0 rgba(0, 212, 255, 0.06) inset;
 }
 
 #leftPanel h2, #rightComparePanel h2 {
@@ -43,7 +66,22 @@ html, body, #cesiumContainer {
   letter-spacing: -0.3px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding-bottom: 16px;
+  animation: fadeSlideIn 0.4s ease both;
 }
+
+/* ── Entrance animation for panel content ── */
+@keyframes fadeSlideIn {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.category {
+  animation: fadeSlideIn 0.4s ease both;
+}
+.category:nth-child(2) { animation-delay: 0.05s; }
+.category:nth-child(3) { animation-delay: 0.1s; }
+.category:nth-child(4) { animation-delay: 0.15s; }
+.category:nth-child(5) { animation-delay: 0.2s; }
 
 /* Правая панель сравнения */
 #rightComparePanel {
@@ -70,9 +108,10 @@ html, body, #cesiumContainer {
 #rightComparePanel.visible {
   transform: translateX(0);
   opacity: 1;
+  box-shadow: -4px 0 40px rgba(0, 0, 0, 0.7), -1px 0 0 rgba(0, 212, 255, 0.06) inset;
 }
 
-/* Правая панель слоёв */
+/* Правая панель слоёв (первое определение - удаляем дубль) */
 #layersPanel {
   position: absolute;
   top: 0;
@@ -95,6 +134,7 @@ html, body, #cesiumContainer {
 
 #layersPanel.visible {
   transform: translateX(0);
+  box-shadow: -4px 0 40px rgba(0, 0, 0, 0.7), -1px 0 0 rgba(0, 212, 255, 0.06) inset;
 }
 
 .category {
@@ -138,23 +178,26 @@ html, body, #cesiumContainer {
   transition: all 0.3s ease;
 }
 
-/* Стили сравнения */
+/* Enhanced comparison badges */
 .info-value.better {
   color: #4caf50;
   font-weight: 700;
   background: rgba(76, 175, 80, 0.15);
+  box-shadow: 0 0 12px rgba(76, 175, 80, 0.08);
 }
 
 .info-value.worse {
   color: #f44336;
   font-weight: 700;
   background: rgba(244, 67, 54, 0.15);
+  box-shadow: 0 0 12px rgba(244, 67, 54, 0.08);
 }
 
 .info-value.equal {
   color: #ffc107;
   font-weight: 700;
   background: rgba(255, 193, 7, 0.15);
+  box-shadow: 0 0 12px rgba(255, 193, 7, 0.08);
 }
 
 .arrow-up::after {
@@ -243,18 +286,37 @@ html, body, #cesiumContainer {
 
 .bottom-btn {
   padding: 8px 20px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
-  color: #fff;
+  color: rgba(255, 255, 255, 0.85);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 0.2px;
 }
 
-.bottom-btn:hover { background: rgba(0, 212, 255, 0.15); border-color: rgba(0, 212, 255, 0.4); }
-.bottom-btn.active { background: rgba(0, 212, 255, 0.3); border-color: #00d4ff; color: #fff; }
+.bottom-btn:hover {
+  background: rgba(0, 212, 255, 0.12);
+  border-color: rgba(0, 212, 255, 0.35);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+.bottom-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.bottom-btn.active {
+  background: rgba(0, 212, 255, 0.2);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 24px rgba(0, 212, 255, 0.12), inset 0 0 20px rgba(0, 212, 255, 0.04);
+}
 
 .bottom-checks {
   display: flex;
@@ -334,6 +396,7 @@ html, body, #cesiumContainer {
 
 #alliancesPanel.visible {
   transform: translateX(0);
+  box-shadow: 4px 0 40px rgba(0, 0, 0, 0.7), 1px 0 0 rgba(0, 212, 255, 0.06) inset;
 }
 
 #alliancesPanel h3 {
@@ -357,13 +420,20 @@ html, body, #cesiumContainer {
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 14px;
 }
 
 .alliance-checkbox:hover {
   background: rgba(0, 212, 255, 0.1);
   border-color: rgba(0, 212, 255, 0.3);
+  box-shadow: 0 0 16px rgba(0, 212, 255, 0.06);
+  transform: translateX(2px);
+}
+
+.alliance-checkbox:has(input:checked) {
+  border-color: rgba(0, 212, 255, 0.25);
+  background: rgba(0, 212, 255, 0.06);
 }
 
 .alliance-checkbox input[type="checkbox"] {
@@ -407,6 +477,7 @@ html, body, #cesiumContainer {
 
 #allianceCard.visible {
   transform: translateX(0);
+  box-shadow: -4px 0 40px rgba(0, 0, 0, 0.7), -1px 0 0 rgba(0, 212, 255, 0.06) inset;
 }
 
 #allianceCard h2 {
@@ -479,6 +550,14 @@ html, body, #cesiumContainer {
   border-radius: 12px;
   font-size: 11px;
   font-weight: 600;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(0, 212, 255, 0.1);
+}
+
+.member-tag:hover {
+  background: rgba(0, 212, 255, 0.25);
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.1);
+  transform: translateY(-1px);
 }
 
 /* Карточка слоя (справа) */
@@ -503,6 +582,7 @@ html, body, #cesiumContainer {
 
 #layerCard.visible {
   transform: translateX(0);
+  box-shadow: -4px 0 40px rgba(0, 0, 0, 0.7), -1px 0 0 rgba(0, 212, 255, 0.06) inset;
 }
 
 #layerCard h2 {
@@ -556,6 +636,13 @@ html, body, #cesiumContainer {
   gap: 10px;
   margin-bottom: 6px;
   font-size: 12px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.legend-item:hover {
+  background: rgba(255,255,255,0.04);
 }
 
 .legend-color {
@@ -563,6 +650,7 @@ html, body, #cesiumContainer {
   height: 14px;
   border-radius: 3px;
   flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(255,255,255,0.05);
 }
 
 .legend-label {
@@ -591,6 +679,7 @@ html, body, #cesiumContainer {
 
 #layersPanel.visible {
   transform: translateX(0);
+  box-shadow: 4px 0 40px rgba(0, 0, 0, 0.7), 1px 0 0 rgba(0, 212, 255, 0.06) inset;
 }
 
 #layersPanel h3 {
@@ -629,6 +718,12 @@ html, body, #cesiumContainer {
 .layer-radio-label:hover {
   background: rgba(0,212,255,0.1);
   border-color: rgba(0,212,255,0.3);
+}
+
+.layer-radio-label:has(input:checked) {
+  border-color: rgba(0,212,255,0.4);
+  background: rgba(0,212,255,0.08);
+  box-shadow: 0 0 12px rgba(0,212,255,0.06);
 }
 
 .layer-radio-label input[type="radio"] {
@@ -745,6 +840,7 @@ html, body, #cesiumContainer {
 
 #tradePanel.visible {
   transform: translateX(0);
+  box-shadow: 4px 0 40px rgba(0, 0, 0, 0.7), 1px 0 0 rgba(0, 212, 255, 0.06) inset;
 }
 
 #tradePanel h2 {
@@ -760,9 +856,10 @@ html, body, #cesiumContainer {
   flex-direction: column;
   gap: 10px;
   margin-bottom: 20px;
-  padding: 12px;
+  padding: 14px;
   background: rgba(255,255,255,0.04);
-  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
 }
 
 .trade-summary-item {
@@ -775,9 +872,17 @@ html, body, #cesiumContainer {
 .trade-item {
   display: flex;
   justify-content: space-between;
-  padding: 6px 0;
+  padding: 8px 0;
   font-size: 13px;
   border-bottom: 1px solid rgba(255,255,255,0.06);
+  transition: background 0.2s;
+  padding: 6px 8px;
+  margin: 0 -8px;
+  border-radius: 4px;
+}
+
+.trade-item:hover {
+  background: rgba(255,255,255,0.03);
 }
 
 /* Панель дипломатии */
@@ -802,6 +907,7 @@ html, body, #cesiumContainer {
 
 #diplomacyPanel.visible {
   transform: translateX(0);
+  box-shadow: 4px 0 40px rgba(0, 0, 0, 0.7), 1px 0 0 rgba(0, 212, 255, 0.06) inset;
 }
 
 #diplomacyPanel h2 {
@@ -818,6 +924,14 @@ html, body, #cesiumContainer {
   border-radius: 10px;
   padding: 14px;
   margin-bottom: 10px;
+  transition: all 0.25s ease;
+}
+
+.diplomacy-doc-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(0, 212, 255, 0.2);
+  box-shadow: 0 0 16px rgba(0, 212, 255, 0.04);
+  transform: translateX(2px);
 }
 
 .diplomacy-doc-header {
@@ -845,4 +959,30 @@ html, body, #cesiumContainer {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.7);
   line-height: 1.5;
+}
+
+/* Close button on country card */
+.close-card-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.5);
+  border-radius: 50%;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+  line-height: 1;
+  padding: 0;
+}
+.close-card-btn:hover {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
 }
