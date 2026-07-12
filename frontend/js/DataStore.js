@@ -115,10 +115,20 @@ class DataStore {
   }
 
   extractISO3(props) {
-    const code = props['ISO3166-1-Alpha-3'] ||
-                 props.ISO_A3 ||
-                 props.ADM0_A3 ||
-                 props.iso3;
+    const ISO2_TO_ISO3 = {
+      "FR": "FRA",  // France
+      "NO": "NOR",  // Norway
+    };
+
+    let code = props['ISO3166-1-Alpha-3'] ||
+               props.ISO_A3 ||
+               props.ADM0_A3 ||
+               props.iso3;
+
+    // Fallback: use ISO2 if ISO3 is invalid
+    if ((!code || code === '-99') && props['ISO3166-1-Alpha-2'] && props['ISO3166-1-Alpha-2'] !== '-99') {
+      code = ISO2_TO_ISO3[props['ISO3166-1-Alpha-2']] || code;
+    }
 
     if (code && code !== '-99') {
       return code;

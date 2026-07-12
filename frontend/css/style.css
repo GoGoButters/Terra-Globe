@@ -961,6 +961,151 @@ html, body, #cesiumContainer {
   line-height: 1.5;
 }
 
+/* ── Diplomacy Manager: new styles ── */
+.dip-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #00d4ff;
+  margin-bottom: 10px;
+  letter-spacing: 0.3px;
+}
+.dip-positive-title { color: #4caf50; }
+.dip-negative-title { color: #f44336; }
+
+.dip-subtitle {
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+  margin: 8px 0 6px;
+  font-weight: 600;
+}
+
+.dip-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+.dip-tag {
+  display: inline-block;
+  padding: 3px 8px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.dip-more {
+  color: rgba(255,255,255,0.4);
+  font-style: italic;
+  border-style: dashed;
+}
+
+.dip-rank-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.dip-rank-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+.dip-rank-item:hover {
+  background: rgba(255,255,255,0.04);
+}
+.dip-rank-num {
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  min-width: 16px;
+  text-align: right;
+}
+.dip-rank-name {
+  font-size: 13px;
+  color: #fff;
+  font-weight: 500;
+  flex: 1;
+}
+.dip-rank-tone {
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 40px;
+  text-align: right;
+}
+.dip-rank-count {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  min-width: 45px;
+  text-align: right;
+}
+
+.dip-article {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.dip-article:last-child {
+  border-bottom: none;
+}
+.dip-article-title {
+  font-size: 12px;
+  color: #e0e0e0;
+  text-decoration: none;
+  line-height: 1.4;
+  display: block;
+  margin-bottom: 3px;
+}
+.dip-article-title:hover {
+  color: #00d4ff;
+  text-decoration: underline;
+}
+.dip-article-meta {
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.dip-text {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.5;
+}
+.dip-detail-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.dip-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+}
+.dip-arrow {
+  font-size: 16px;
+  color: #00d4ff;
+}
+.diplomacy-doc-card.dip-positive {
+  border-color: rgba(76, 175, 80, 0.2);
+}
+.diplomacy-doc-card.dip-positive:hover {
+  border-color: rgba(76, 175, 80, 0.4);
+  box-shadow: 0 0 16px rgba(76, 175, 80, 0.06);
+}
+.diplomacy-doc-card.dip-negative {
+  border-color: rgba(244, 67, 54, 0.2);
+}
+.diplomacy-doc-card.dip-negative:hover {
+  border-color: rgba(244, 67, 54, 0.4);
+  box-shadow: 0 0 16px rgba(244, 67, 54, 0.06);
+}
+
+
 /* Close button on country card */
 .close-card-btn {
   position: absolute;

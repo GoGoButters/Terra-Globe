@@ -109,7 +109,7 @@ while IFS= read -r url; do
       NAME=$(echo "$JSON" | jq -r '.ps // empty')
       NET=$(echo "$JSON" | jq -r '.net // "tcp"')
       TLS=$(echo "$JSON" | jq -r '.tls // ""')
-      PATH=$(echo "$JSON" | jq -r '.path // ""')
+      URL_PATH=$(echo "$JSON" | jq -r '.path // ""')
       VHOST=$(echo "$JSON" | jq -r '.host // ""')
       SCYPE=$(echo "$JSON" | jq -r '.type // "auto"')
       AID=$(echo "$JSON" | jq -r '.aid // "0"')
@@ -126,7 +126,7 @@ while IFS= read -r url; do
       STREAM_TLS="{}"
 
       if [ "$NET" = "ws" ]; then
-        STREAM_WS=$(jq -n --arg path "$PATH" --arg host "$VHOST" '{path: $path, headers: {Host: $host}}')
+        STREAM_WS=$(jq -n --arg path "$URL_PATH" --arg host "$VHOST" '{path: $path, headers: {Host: $host}}')
       elif [ "$NET" = "grpc" ]; then
         STREAM_WS=$(jq -n --arg sn "$(echo "$JSON" | jq -r '.path // ""')" '{serviceName: $sn}')
       fi
@@ -198,7 +198,7 @@ while IFS= read -r url; do
       TLS=$(echo "$PARAMS" | grep -oP 'security=\K[^&]+' || echo "none")
       SNI=$(echo "$PARAMS" | grep -oP 'sni=\K[^&]+' || echo "")
       FP=$(echo "$PARAMS" | grep -oP 'fp=\K[^&]+' || echo "")
-      PATH=$(echo "$PARAMS" | grep -oP 'path=\K[^&]+' || echo "")
+      URL_PATH=$(echo "$PARAMS" | grep -oP 'path=\K[^&]+' || echo "")
       HOST_PARAM=$(echo "$PARAMS" | grep -oP 'host=\K[^&]+' || echo "")
       TYPE=$(echo "$PARAMS" | grep -oP 'type=\K[^&]+' || echo "tcp")
 
@@ -207,7 +207,7 @@ while IFS= read -r url; do
       STREAM_TLS="{}"
 
       if [ "$NET" = "ws" ]; then
-        STREAM_WS=$(jq -n --arg path "$PATH" --arg host "${HOST_PARAM:-$HOST}" '{path: $path, headers: {Host: $host}}')
+        STREAM_WS=$(jq -n --arg path "$URL_PATH" --arg host "${HOST_PARAM:-$HOST}" '{path: $path, headers: {Host: $host}}')
       elif [ "$NET" = "grpc" ]; then
         STREAM_WS=$(jq -n --arg sn "$(echo "$PARAMS" | grep -oP 'serviceName=\K[^&]+' || echo "")" '{serviceName: $sn}')
       fi
@@ -271,7 +271,7 @@ while IFS= read -r url; do
       SNI=$(echo "$PARAMS" | grep -oP 'sni=\K[^&]+' || echo "")
       FP=$(echo "$PARAMS" | grep -oP 'fp=\K[^&]+' || echo "")
       NET=$(echo "$PARAMS" | grep -oP 'type=\K[^&]+' || echo "tcp")
-      PATH=$(echo "$PARAMS" | grep -oP 'path=\K[^&]+' || echo "")
+      URL_PATH=$(echo "$PARAMS" | grep -oP 'path=\K[^&]+' || echo "")
 
       STREAM_TLS=$(jq -n \
         --arg serverName "${SNI:-$HOST}" \
@@ -280,7 +280,7 @@ while IFS= read -r url; do
 
       STREAM_WS="{}"
       if [ "$NET" = "ws" ]; then
-        STREAM_WS=$(jq -n --arg path "$PATH" '{path: $path, headers: {}}')
+        STREAM_WS=$(jq -n --arg path "$URL_PATH" '{path: $path, headers: {}}')
       fi
 
       OUTBOUND=$(jq -n \

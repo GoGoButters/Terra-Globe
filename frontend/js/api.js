@@ -189,6 +189,10 @@ const API = {
     return this.get(`/diplomacy${params}`);
   },
 
+  async getDiplomacyProfile(iso3) {
+    return this.get(`/diplomacy/${iso3}`);
+  },
+
   async getDiplomaticRelations(iso3A, iso3B) {
     return this.get(`/diplomacy/${iso3A}/${iso3B}`);
   },

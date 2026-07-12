@@ -211,7 +211,7 @@ class GlobeApp {
     this.tradeManager = new TradeManager(this.viewer, this.dataStore, this.capitalsManager);
     await this.tradeManager.load();
 
-    this.diplomacyManager = new DiplomacyManager(this.viewer, this.dataStore);
+    this.diplomacyManager = new DiplomacyManager(this.viewer, this.dataStore, this.capitalsManager);
     await this.diplomacyManager.load();
 
     // ── Step 5: Wire UI ──

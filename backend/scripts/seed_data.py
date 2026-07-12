@@ -128,6 +128,12 @@ CAPITAL_NAMES_RU = {
     "YEM": "Сана", "ZMB": "Лусака", "ZWE": "Хараре",
 }
 
+# ISO2 → ISO3 fallback for countries with bad ISO3 codes in GeoJSON
+ISO2_TO_ISO3 = {
+    "FR": "FRA",  # France
+    "NO": "NOR",  # Norway
+}
+
 # Path to static data files
 # Host:   terra-globe/frontend/data  (script at backend/scripts/)
 # Docker: /app/frontend/data         (script at /app/scripts/)
@@ -165,6 +171,12 @@ async def seed_countries(session: AsyncSession) -> None:
     for feature in geojson["features"]:
         props = feature["properties"]
         iso3 = props.get("ISO3166-1-Alpha-3", "")
+        iso2 = props.get("ISO3166-1-Alpha-2", "")
+
+        # Fallback: use ISO2 code if ISO3 is invalid
+        if iso3 in ("-99", "", None) and iso2 and iso2 != "-99":
+            iso3 = ISO2_TO_ISO3.get(iso2, iso3)
+
         name = props.get("name") or props.get("NAME", "")
 
         # Skip invalid entries

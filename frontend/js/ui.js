@@ -289,8 +289,8 @@ function setupUI(viewer, layerManager, countryCard, capitalsManager, tradeManage
     activeMode = 'diplomacy';
     firstCountryData = null;
     secondCountryData = null;
-    document.getElementById('diplomacyTitle').textContent = 'Выберите две страны';
-    document.getElementById('diplomacySummary').textContent = 'Кликните по первой стране, затем по второй для просмотра дипломатических отношений.';
+    document.getElementById('diplomacyTitle').textContent = 'Выберите страну';
+    document.getElementById('diplomacySummary').textContent = 'Кликните по стране для просмотра дипломатического профиля: посольства, тон отношений, ключевые партнёры.';
     document.getElementById('diplomacyDocs').innerHTML = '';
   }
 
@@ -353,22 +353,11 @@ function setupUI(viewer, layerManager, countryCard, capitalsManager, tradeManage
       }
 
       if (activeMode === 'diplomacy') {
-        if (!firstCountryData) {
-          firstCountryData = data;
-          countryCard.show(data);
-          layerManager.highlight(data.iso3);
-          console.log('🤝 Первая страна:', data.name);
-        } else if (!secondCountryData && data.iso3 !== firstCountryData.iso3) {
-          secondCountryData = data;
-          console.log('🤝 Вторая страна:', data.name);
-          diplomacyManager.showRelations(firstCountryData.iso3, secondCountryData.iso3);
-        } else {
-          firstCountryData = data;
-          secondCountryData = null;
-          countryCard.show(data);
-          layerManager.highlight(data.iso3);
-          diplomacyPanel.classList.remove('visible');
-        }
+        // Single-click shows full diplomatic profile for that country
+        diplomacyManager.showCountryProfile(data.iso3);
+        countryCard.show(data);
+        layerManager.highlight(data.iso3);
+        firstCountryData = data;
         return;
       }
 
