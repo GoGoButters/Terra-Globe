@@ -225,6 +225,7 @@ class LayerManager {
         translucencyByDistance: new Cesium.NearFarScalar(3e6, 1.0, farDist * 0.7, 0.0),
         pixelOffset: new Cesium.Cartesian2(0, 2),
       },
+      _customData: { iso3, name, type: 'label' },
     });
   }
 

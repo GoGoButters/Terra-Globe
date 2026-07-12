@@ -31,6 +31,7 @@ class CapitalsManager {
           },
           description: `<b>${cap.name}</b><br/>Столица`,
           show: this._visible,
+          _customData: { iso3, name: cap.name, type: 'capital' },
         });
 
         const label = this.viewer.entities.add({
@@ -47,6 +48,7 @@ class CapitalsManager {
             distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 5000000),
           },
           show: this._visible,
+          _customData: { iso3, name: cap.name, type: 'capitalLabel' },
         });
 
         this._allEntities.push(point, label);
