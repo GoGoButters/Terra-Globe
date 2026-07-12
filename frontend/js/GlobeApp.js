@@ -78,10 +78,13 @@ class GlobeApp {
     }
 
     // ── Step 2b: Create Cesium Viewer with performance + visuals ──
+    // NOTE: CesiumJS 1.113 ignores `imageryProvider` option with baseLayerPicker:false.
+    // We add imagery layers manually AFTER viewer creation.
     this.viewer = new Cesium.Viewer('cesiumContainer', {
       animation: false,
       timeline: false,
       baseLayerPicker: false,
+      baseLayer: false,
       fullscreenButton: false,
       homeButton: false,
       sceneModePicker: false,
@@ -89,32 +92,16 @@ class GlobeApp {
       geocoder: false,
       infoBox: false,
       selectionIndicator: false,
-      // ── Base imagery (loaded above) ──
-      imageryProvider: imageryProvider,
     });
 
     console.log('🌍 Cesium запущен, версия:', Cesium.VERSION);
 
-    // ── Imagery diagnostics + fallback ──
+    // ── Add imagery layer manually (required in CesiumJS 1.113) ──
+    this.viewer.imageryLayers.addImageryProvider(imageryProvider);
     const il = this.viewer.imageryLayers;
     console.log('🛰️ Imagery layers count:', il.length);
-    if (il.length > 0) {
-      const provider = il.get(0).imageryProvider;
-      console.log('🛰️ Base imagery provider:', provider?.constructor?.name || 'unknown');
-      console.log('🛰️ Provider URL:', provider?.url || provider?._resource?.url || 'unknown');
-    } else {
-      console.warn('⚠️ NO imagery layers! Attempting manual fallback...');
-      // Last-ditch effort: add imagery manually
-      try {
-        const osm = new Cesium.OpenStreetMapImageryProvider({
-          url: 'https://tile.openstreetmap.org/'
-        });
-        this.viewer.imageryLayers.addImageryProvider(osm);
-        console.log('🛰️ Manually added OpenStreetMap fallback');
-      } catch (e) {
-        console.error('❌ Even OpenStreetMap fallback failed:', e.message);
-      }
-    }
+    console.log('🛰️ Base imagery provider:', il.get(0)?.imageryProvider?.constructor?.name || 'unknown');
+    console.log('🛰️ Provider URL:', il.get(0)?.imageryProvider?.url || il.get(0)?.imageryProvider?._resource?.url || 'unknown');
 
     // ── Set terrain provider (Cesium World Terrain) with fallback ──
     try {
