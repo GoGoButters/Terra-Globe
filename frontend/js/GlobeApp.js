@@ -12,7 +12,6 @@ class GlobeApp {
   }
 
   async start() {
-    // Check Cesium loaded
     if (typeof Cesium === 'undefined') {
       throw new Error(
         'CesiumJS не загрузился. Проверьте подключение к интернету. ' +
@@ -23,22 +22,20 @@ class GlobeApp {
     // Load config (Cesium token) from API
     await loadConfig();
 
-    // Set up auth change listener BEFORE init
     this.authManager.onAuthChange = (isAuthenticated, user) => {
       if (isAuthenticated && !this._initialized) {
-        this._initializeApp();
+        this._initializeApp().catch(err => {
+          console.error('❌ GlobeApp initialization failed:', err);
+          this._initialized = false;
+        });
       }
     };
 
-    // Initialize auth — this checks tokens and shows/dismisses the gate
     await this.authManager.init();
 
-    // If already authenticated, initialize immediately
     if (this.authManager.isAuthenticated()) {
       await this._initializeApp();
     }
-    // Otherwise, the auth gate is visible and _initializeApp will be called
-    // when the user successfully logs in (via onAuthChange callback)
   }
 
   async _initializeApp() {
@@ -47,13 +44,40 @@ class GlobeApp {
 
     console.log('🔓 Auth confirmed, initializing TerraGlobe...');
 
-    // Load data from API (non-blocking — globe works even if data fails)
+    // ── Step 1: Load country + GeoJSON data ──
     try {
       await this.dataStore.load();
     } catch (e) {
       console.warn('⚠️ Data load failed, globe will start empty:', e.message);
     }
 
+    // ── Step 2a: Create imagery provider (ArcGIS primary — free, no token) ──
+    let imageryProvider;
+
+    // 1st try: ArcGIS World Imagery (free, no token needed — most reliable)
+    try {
+      imageryProvider = await Cesium.ArcGisMapServerImageryProvider.fromUrl(
+        'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer',
+        { enablePickFeatures: false }
+      );
+      console.log('🛰️ Using ArcGIS World Imagery');
+    } catch (arcErr) {
+      console.warn('⚠️ ArcGIS imagery failed:', arcErr.message);
+      // 2nd try: Cesium Ion World Imagery (needs valid token)
+      try {
+        imageryProvider = await Cesium.createWorldImageryAsync();
+        console.log('🛰️ Using Cesium Ion World Imagery');
+      } catch (ionErr) {
+        console.warn('⚠️ Cesium Ion imagery failed:', ionErr.message);
+        // 3rd try: OpenStreetMap (always available, maps not satellite)
+        imageryProvider = new Cesium.OpenStreetMapImageryProvider({
+          url: 'https://tile.openstreetmap.org/'
+        });
+        console.log('🛰️ Using OpenStreetMap (fallback — no satellite)');
+      }
+    }
+
+    // ── Step 2b: Create Cesium Viewer with performance + visuals ──
     this.viewer = new Cesium.Viewer('cesiumContainer', {
       animation: false,
       timeline: false,
@@ -65,12 +89,95 @@ class GlobeApp {
       geocoder: false,
       infoBox: false,
       selectionIndicator: false,
+      // ── Base imagery (loaded above) ──
+      imageryProvider: imageryProvider,
     });
+
     console.log('🌍 Cesium запущен, версия:', Cesium.VERSION);
 
-    this.layerManager = new LayerManager(this.viewer, this.dataStore);
+    // ── Imagery diagnostics + fallback ──
+    const il = this.viewer.imageryLayers;
+    console.log('🛰️ Imagery layers count:', il.length);
+    if (il.length > 0) {
+      const provider = il.get(0).imageryProvider;
+      console.log('🛰️ Base imagery provider:', provider?.constructor?.name || 'unknown');
+      console.log('🛰️ Provider URL:', provider?.url || provider?._resource?.url || 'unknown');
+    } else {
+      console.warn('⚠️ NO imagery layers! Attempting manual fallback...');
+      // Last-ditch effort: add imagery manually
+      try {
+        const osm = new Cesium.OpenStreetMapImageryProvider({
+          url: 'https://tile.openstreetmap.org/'
+        });
+        this.viewer.imageryLayers.addImageryProvider(osm);
+        console.log('🛰️ Manually added OpenStreetMap fallback');
+      } catch (e) {
+        console.error('❌ Even OpenStreetMap fallback failed:', e.message);
+      }
+    }
 
-    // Load layer and alliance data from API
+    // ── Set terrain provider (Cesium World Terrain) with fallback ──
+    try {
+      const terrain = await Promise.race([
+        Cesium.CesiumTerrainProvider.fromIonAssetId(1),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Terrain load timeout')), 10000))
+      ]);
+      this.viewer.terrainProvider = terrain;
+      console.log('🏔️ Cesium World Terrain loaded');
+    } catch (e) {
+      console.warn('⚠️ World Terrain not available, continuing flat:', e.message);
+      this.viewer.terrainProvider = new Cesium.EllipsoidTerrainProvider();
+    }
+
+    // ── Step 3: Scene tuning for realistic satellite look ──
+    const scene = this.viewer.scene;
+    const globe = scene.globe;
+
+    // Globe base — dark blue space (not pure black) so night side has subtle glow
+    globe.baseColor = Cesium.Color.fromCssColorString('#080818');
+
+    // Realistic day/night lighting — THIS creates the day/night terminator
+    globe.enableLighting = true;
+    globe.showGroundAtmosphere = true;
+
+    // Start with depth test off — only enable after terrain confirms loaded
+    globe.depthTestAgainstTerrain = false;
+
+    // Anti-aliasing (FXAA)
+    scene.fxaa = true;
+    scene.postProcessStages.fxaa.enabled = true;
+
+    // Atmosphere — visible, natural look
+    const atmosphere = scene.skyAtmosphere;
+    atmosphere.show = true;
+    atmosphere.hueShift = 0;
+    atmosphere.saturationShift = 0;
+    atmosphere.brightnessShift = 0;
+
+    // Remove heavy fog — it darkens everything
+    scene.fog.enabled = false;
+
+    // CRITICAL: Allow Cesium to re-render periodically for real-time day/night.
+    // maximumRenderTimeChange controls how often the scene re-renders.
+    // Setting to 60 means: re-render every 60 simulated seconds of clock time.
+    scene.requestRenderMode = true;
+    scene.maximumRenderTimeChange = 60.0;
+    scene.targetFrameRate = 30;
+
+    // Sun/moon
+    scene.sun.show = true;
+    scene.moon.show = false;
+
+    // Enable depth test against terrain only after terrain is confirmed ready
+    this.viewer.scene.globe.terrainProviderChanged.addEventListener(() => {
+      globe.depthTestAgainstTerrain = true;
+      console.log('🏔️ Terrain confirmed — depth test enabled');
+    });
+
+    // ── Step 4: Initialize managers ──
+    this.layerManager = new LayerManager(this.viewer, this.dataStore);
+    this.capitalsManager = new CapitalsManager(this.viewer, this.dataStore);
+
     try {
       await this.layerManager.loadLayersData();
       await this.layerManager.loadAlliances();
@@ -78,9 +185,9 @@ class GlobeApp {
       console.warn('⚠️ Layer/alliance data failed to load:', e.message);
     }
 
+    // Create country polygon entities — with simplified GeoJSON for perf
     this.layerManager.createAllEntities();
 
-    this.capitalsManager = new CapitalsManager(this.viewer, this.dataStore);
     try {
       await this.capitalsManager.load();
     } catch (e) {
@@ -93,7 +200,11 @@ class GlobeApp {
     this.diplomacyManager = new DiplomacyManager(this.viewer, this.dataStore);
     await this.diplomacyManager.load();
 
+    // ── Step 5: Wire UI ──
     setupUI(this.viewer, this.layerManager, this.countryCard, this.capitalsManager, this.tradeManager, this.diplomacyManager);
+
+    // ── Step 6: Trigger first render ──
+    scene.requestRender();
 
     console.log('✅ TerraGlobe готов к работе');
   }
