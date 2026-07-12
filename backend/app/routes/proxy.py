@@ -81,7 +81,7 @@ async def proxy_get(
             "status_code": resp.status_code,
             "headers": resp_headers,
         }
-        await set_cache("proxy", url, cache_data, CACHE_TTL)
+        await set_cache("proxy", url, value=cache_data, ttl=CACHE_TTL)
 
         return Response(
             content=resp.content,

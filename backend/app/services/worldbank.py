@@ -122,7 +122,7 @@ async def fetch_indicator(
                 country_param = ";".join(iso3_list[:10])  # Limit to avoid URL length issues
 
             data = await _fetch_wb_indicator(wb_code, country_param)
-            await set_cache("wb", wb_code, data, 1800)
+            await set_cache("wb", wb_code, value=data, ttl=1800)
         await _set_cache(cache_key, data, db)
 
     results = []

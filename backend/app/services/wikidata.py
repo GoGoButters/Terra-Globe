@@ -49,7 +49,7 @@ async def _sparql_query(query: str) -> list[dict]:
         resp.raise_for_status()
         data = resp.json()
         bindings = data.get("results", {}).get("bindings", [])
-        await set_cache("wikidata", cache_key, bindings, CACHE_TTL)
+        await set_cache("wikidata", cache_key, value=bindings, ttl=CACHE_TTL)
         return bindings
     except Exception as e:
         logger.warning("Wikidata SPARQL failed: %s", e)

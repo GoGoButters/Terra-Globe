@@ -164,7 +164,7 @@ async def fetch_indicator(
             data = await _fetch_imf_data(imf_config["flow"], imf_config["key"])
             if data is None:
                 return []
-            await set_cache("imf", cache_key, {"data": data}, 1800)
+            await set_cache("imf", cache_key, value={"data": data}, ttl=1800)
         await _set_cache(cache_key, {"data": data}, db)
 
     return data

@@ -192,7 +192,7 @@ async def get_country_tone(
                     "trend": "stable",
                 }
 
-            await set_cache("gdelt", cache_key, result, CACHE_TTL)
+            await set_cache("gdelt", cache_key, value=result, ttl=CACHE_TTL)
             results[target] = result
 
         except Exception as e:

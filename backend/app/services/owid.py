@@ -359,7 +359,7 @@ async def fetch_indicator(
             if df is None:
                 return []
             # Cache in Redis (fast) and DB (durable)
-            await set_cache("owid", our_code, {"data": df.to_dict(orient="records")}, 1800)
+            await set_cache("owid", our_code, value={"data": df.to_dict(orient="records")}, ttl=1800)
         await _set_cache(cache_key, {"data": df.to_dict(orient="records")}, db)
 
     results = []
