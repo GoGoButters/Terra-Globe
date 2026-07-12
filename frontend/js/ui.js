@@ -328,17 +328,12 @@ function setupUI(viewer, layerManager, countryCard, capitalsManager, tradeManage
     try {
       if (activeMode === 'alliances' || activeMode === 'layers') return;
 
-      // Use drillPick to get ALL objects at click position (including terrain)
-      const allPicks = viewer.scene.drillPick(click.position);
-      const countryPick = allPicks.find(p => p.id && p.id._customData && p.id._customData.iso3);
-
-      // No country entity hit → deselect
-      if (!countryPick) {
+      const picked = viewer.scene.pick(click.position);
+      if (!Cesium.defined(picked) || !picked.id || !picked.id._customData) {
         if (!compareMode) _deselect();
         return;
       }
-
-      const entityData = countryPick.id._customData;
+      const entityData = picked.id._customData;
 
       // Same country → toggle deselect
       if (entityData.iso3 === layerManager.highlightedIso) {
